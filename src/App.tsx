@@ -29,11 +29,11 @@ function TasksRoute() {
 function AppShell() {
   const [tagFilter, setTagFilter] = useState<TagFilter>('all')
   const location = useLocation()
-  const showFilters = location.pathname === '/tasks'
+  const isTasks = location.pathname === '/tasks'
 
   return (
-    <div className={showFilters ? 'app app--tasks' : 'app'}>
-      {showFilters ? (
+    <div className={isTasks ? 'app app--tasks' : 'app'}>
+      {isTasks ? (
         <Navbar activeFilter={tagFilter} onFilterChange={setTagFilter} />
       ) : (
         <nav className="navbar" aria-label="Main">
@@ -42,10 +42,10 @@ function AppShell() {
           </Link>
         </nav>
       )}
-      <main className="app__main">
+      <main className={isTasks ? 'app__main app__main--board' : 'app__main'}>
         <Outlet context={{ tagFilter } satisfies AppShellContext} />
       </main>
-      <Footer />
+      {!isTasks && <Footer />}
     </div>
   )
 }

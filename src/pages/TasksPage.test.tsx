@@ -4,7 +4,9 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { TasksPage } from './TasksPage'
 
-function renderTasks(tagFilter: 'all' | 'Discovery' | 'Design' | 'Engineering' | 'Growth' | 'Bug' = 'all') {
+function renderTasks(
+  tagFilter: 'all' | 'Discovery' | 'Design' | 'Engineering' | 'Growth' | 'Bug' = 'all',
+) {
   return render(
     <MemoryRouter>
       <TasksPage tagFilter={tagFilter} />
@@ -27,14 +29,20 @@ function createDataTransfer() {
 }
 
 describe('TasksPage Kanban', () => {
-  it('shows product Kanban columns', () => {
+  it('shows a full-bleed Kanban board with sticky-note cards', () => {
     renderTasks()
 
-    expect(screen.getByRole('heading', { name: /product board/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /kanban board/i })).toBeInTheDocument()
+    expect(screen.getByTestId('kanban-board')).toBeInTheDocument()
     expect(screen.getByRole('region', { name: /^backlog$/i })).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: /^in progress$/i })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /^doing$/i })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: /^review$/i })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: /^done$/i })).toBeInTheDocument()
+
+    const card = screen
+      .getByText(/validate pricing hypothesis/i)
+      .closest('[data-todo-id]') as HTMLElement
+    expect(card).toHaveClass('tasks__sticky')
   })
 
   it('renders tags on work items', () => {
@@ -46,7 +54,7 @@ describe('TasksPage Kanban', () => {
     expect(within(card).getByText(/^discovery$/i)).toBeInTheDocument()
   })
 
-  it('adds a tagged work item to Backlog', async () => {
+  it('adds a tagged sticky note to Backlog', async () => {
     const user = userEvent.setup()
     renderTasks()
 
@@ -55,24 +63,26 @@ describe('TasksPage Kanban', () => {
     await user.click(screen.getByRole('button', { name: /^add$/i }))
 
     const backlog = screen.getByRole('region', { name: /^backlog$/i })
-    const card = within(backlog).getByText(/map checkout funnel/i).closest('[data-todo-id]')
-    expect(card).toBeTruthy()
-    expect(within(card as HTMLElement).getByText(/^growth$/i)).toBeInTheDocument()
+    const card = within(backlog)
+      .getByText(/map checkout funnel/i)
+      .closest('[data-todo-id]') as HTMLElement
+    expect(card).toHaveClass('tasks__sticky')
+    expect(within(card).getByText(/^growth$/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/new work item/i)).toHaveValue('')
   })
 
-  it('drags a card from Backlog into In Progress', () => {
+  it('drags a sticky note from Backlog into Doing', () => {
     renderTasks()
 
     const card = screen.getByText(/validate pricing hypothesis/i).closest('[data-todo-id]')!
-    const inProgress = screen.getByRole('region', { name: /^in progress$/i })
+    const doing = screen.getByRole('region', { name: /^doing$/i })
     const dataTransfer = createDataTransfer()
 
     fireEvent.dragStart(card, { dataTransfer })
-    fireEvent.dragOver(inProgress, { dataTransfer })
-    fireEvent.drop(inProgress, { dataTransfer })
+    fireEvent.dragOver(doing, { dataTransfer })
+    fireEvent.drop(doing, { dataTransfer })
 
-    expect(within(inProgress).getByText(/validate pricing hypothesis/i)).toBeInTheDocument()
+    expect(within(doing).getByText(/validate pricing hypothesis/i)).toBeInTheDocument()
     expect(
       within(screen.getByRole('region', { name: /^backlog$/i })).queryByText(
         /validate pricing hypothesis/i,

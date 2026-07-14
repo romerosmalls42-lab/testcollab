@@ -2,6 +2,7 @@ import { useState, type DragEvent, type FormEvent } from 'react'
 import {
   KANBAN_COLUMNS,
   TODO_TAGS,
+  stickyToneFor,
   type KanbanColumnId,
   type TagFilter,
   type Todo,
@@ -128,9 +129,9 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
   return (
     <div className="tasks">
       <header className="tasks__header">
-        <h1 className="tasks__title">Product board</h1>
+        <h1 className="tasks__title">Kanban Board</h1>
         <p className="tasks__hint">
-          Track product work across the pipeline. Drag cards between columns. Filter by tag.
+          Drag sticky notes across Backlog, Doing, Review, and Done. Filter by product tag.
         </p>
       </header>
 
@@ -169,13 +170,14 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
         </div>
       </form>
 
-      <div className="tasks__board tasks__board--kanban">
+      <div className="tasks__board tasks__board--kanban" data-testid="kanban-board">
         {KANBAN_COLUMNS.map((column) => {
           const columnTodos = visibleTodos.filter((todo) => todo.status === column.id)
           return (
             <KanbanColumn
               key={column.id}
               title={column.title}
+              tone={column.tone}
               status={column.id}
               todos={columnTodos}
               empty={emptyCopy(column.id)}
@@ -197,18 +199,19 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
 function emptyCopy(column: KanbanColumnId) {
   switch (column) {
     case 'backlog':
-      return 'Ideas and next bets land here.'
+      return 'Park the next bets here.'
     case 'in_progress':
-      return 'Pull a card in when work starts.'
+      return 'Drop a sticky note when work starts.'
     case 'review':
       return 'Ready for critique or QA.'
     case 'done':
-      return 'Shipped work shows up here.'
+      return 'Shipped work sticks here.'
   }
 }
 
 type KanbanColumnProps = {
   title: string
+  tone: 'coral' | 'gold' | 'mint' | 'sky'
   status: KanbanColumnId
   todos: Todo[]
   empty: string
@@ -223,6 +226,7 @@ type KanbanColumnProps = {
 
 function KanbanColumn({
   title,
+  tone,
   status,
   todos,
   empty,
@@ -237,56 +241,61 @@ function KanbanColumn({
   return (
     <section
       className={
-        isDropTarget ? 'tasks__section tasks__section--target' : 'tasks__section'
+        isDropTarget
+          ? `tasks__column tasks__column--${tone} tasks__column--target`
+          : `tasks__column tasks__column--${tone}`
       }
       aria-label={title}
       onDragOver={(event) => onDragOver(event, status)}
       onDrop={(event) => onDrop(event, status)}
     >
-      <div className="tasks__section-head">
-        <h2 className="tasks__section-title">{title}</h2>
+      <div className="tasks__column-head">
+        <h2 className="tasks__column-title">{title}</h2>
         <span className="tasks__count">{todos.length}</span>
       </div>
 
-      {todos.length === 0 ? (
-        <p className="tasks__empty">{empty}</p>
-      ) : (
-        <ul className="tasks__list">
-          {todos.map((todo) => (
-            <li
-              key={todo.id}
-              className={
-                draggingId === todo.id
-                  ? 'tasks__item tasks__item--dragging'
-                  : 'tasks__item'
-              }
-              data-todo-id={todo.id}
-              draggable
-              onDragStart={(event) => onDragStart(event, todo.id)}
-              onDragEnd={onDragEnd}
-            >
-              <div className="tasks__card">
-                <p className="tasks__task-title">{todo.title}</p>
-                <ul className="tasks__tags">
-                  {todo.tags.map((tag) => (
-                    <li key={tag} className={tagClass(tag)}>
-                      {tag}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <button
-                type="button"
-                className="tasks__delete"
-                aria-label={`Delete ${todo.title}`}
-                onClick={() => onDelete(todo.id)}
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="tasks__column-body">
+        {todos.length === 0 ? (
+          <p className="tasks__empty">{empty}</p>
+        ) : (
+          <ul className="tasks__list">
+            {todos.map((todo) => {
+              const toneName = stickyToneFor(todo.id)
+              return (
+                <li
+                  key={todo.id}
+                  className={
+                    draggingId === todo.id
+                      ? `tasks__sticky tasks__sticky--${toneName} tasks__sticky--dragging`
+                      : `tasks__sticky tasks__sticky--${toneName}`
+                  }
+                  data-todo-id={todo.id}
+                  draggable
+                  onDragStart={(event) => onDragStart(event, todo.id)}
+                  onDragEnd={onDragEnd}
+                >
+                  <p className="tasks__task-title">{todo.title}</p>
+                  <ul className="tasks__tags">
+                    {todo.tags.map((tag) => (
+                      <li key={tag} className={tagClass(tag)}>
+                        {tag}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    className="tasks__delete"
+                    aria-label={`Delete ${todo.title}`}
+                    onClick={() => onDelete(todo.id)}
+                  >
+                    Remove
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
     </section>
   )
 }
