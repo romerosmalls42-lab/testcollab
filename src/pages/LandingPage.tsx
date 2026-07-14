@@ -9,8 +9,10 @@ import {
   useTransform,
 } from 'framer-motion'
 import { Hero3D, ORBIT_CARDS } from '../components/Hero3D'
+import { LandingNavbar } from '../components/LandingNavbar'
 import { Footer } from '../components/Footer'
 import '../components/Hero3D.css'
+import '../components/LandingNavbar.css'
 import '../components/Footer.css'
 import './LandingPage.css'
 
@@ -54,6 +56,7 @@ export function LandingPage() {
 
   return (
     <div className="landing" data-testid="parallax-landing">
+      <LandingNavbar />
       <div
         className="landing__scroll-track"
         data-testid="landing-scroll-track"

@@ -5,6 +5,7 @@
   --gold-bright: #f0d78c;
   --mute: rgba(248, 241, 223, 0.72);
 
+  position: relative;
   min-height: 100vh;
   color: var(--ink);
   background: var(--paper);

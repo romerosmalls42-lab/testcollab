@@ -95,4 +95,19 @@ describe('LandingPage', () => {
 
     expect(screen.getByText(/scroll to explore the board/i)).toBeInTheDocument()
   })
+
+  it('shows a landing navbar with To-Do, Add Team Members, and Dashboard', () => {
+    renderLanding()
+
+    const nav = screen.getByRole('navigation', { name: /landing/i })
+    expect(nav).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^add team members$/i })).toHaveAttribute(
+      'href',
+      '/team',
+    )
+    expect(screen.getByRole('link', { name: /^dashboard$/i })).toHaveAttribute(
+      'href',
+      '/dashboard',
+    )
+  })
 })

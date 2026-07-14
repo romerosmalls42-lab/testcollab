@@ -12,10 +12,12 @@ import { Footer } from './components/Footer'
 import { ScrollToTop } from './components/ScrollToTop'
 import { AboutPage } from './pages/AboutPage'
 import { LandingPage } from './pages/LandingPage'
+import { DashboardPage, TeamPage } from './pages/SimplePage'
 import { TasksPage } from './pages/TasksPage'
 import type { TagFilter } from './types/todo'
 import './components/Navbar.css'
 import './components/Footer.css'
+import './pages/SimplePage.css'
 import './App.css'
 
 type AppShellContext = {
@@ -59,6 +61,8 @@ function App() {
         <Route index element={<LandingPage />} />
         <Route element={<AppShell />}>
           <Route path="tasks" element={<TasksRoute />} />
+          <Route path="team" element={<TeamPage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
           <Route path="about" element={<AboutPage />} />
         </Route>
       </Routes>

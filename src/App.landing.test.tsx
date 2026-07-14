@@ -71,4 +71,23 @@ describe('Landing routing', () => {
 
     expect(scrollTo).toHaveBeenCalledWith(0, 0)
   })
+
+  it('opens Add Team Members and Dashboard from the landing navbar', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('link', { name: /^add team members$/i }))
+    expect(
+      screen.getByRole('heading', { name: /^add team members$/i }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('link', { name: /^to-do$/i }))
+    await user.click(screen.getByRole('link', { name: /^dashboard$/i }))
+    expect(screen.getByRole('heading', { name: /^dashboard$/i })).toBeInTheDocument()
+  })
 })

@@ -1,0 +1,56 @@
+.simple-page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+  color: #f8f1df;
+}
+
+.simple-page__title {
+  margin: 0 0 0.85rem;
+  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: #f0d78c;
+}
+
+.simple-page__lead {
+  margin: 0 0 1.75rem;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: rgba(248, 241, 223, 0.78);
+}
+
+.simple-page__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.2rem;
+  background: linear-gradient(180deg, #f0d78c 0%, #d4af37 100%);
+  color: #111111;
+  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid #f6e7a8;
+}
+
+.simple-page__cta:hover,
+.simple-page__cta:focus-visible {
+  background: linear-gradient(180deg, #f6e3a3 0%, #e0bc4a 100%);
+  outline: none;
+}
+
+.app:has(.simple-page) {
+  background: #070707;
+}
+
+.app:has(.simple-page) .navbar {
+  background: linear-gradient(180deg, #121212 0%, #050505 100%);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.28);
+}
+
+.app:has(.simple-page) .navbar__brand {
+  color: #f0d78c;
+}
