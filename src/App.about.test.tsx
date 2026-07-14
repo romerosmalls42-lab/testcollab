@@ -33,6 +33,6 @@ describe('About page routing', () => {
 
     await user.click(screen.getByRole('link', { name: /back to tasks/i }))
 
-    expect(screen.getByRole('heading', { name: /kanban board/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /mission control/i })).toBeInTheDocument()
   })
 })

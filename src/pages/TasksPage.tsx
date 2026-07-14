@@ -1,9 +1,12 @@
 import { useEffect, useState, type DragEvent, type FormEvent } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
+  AGENTS,
   KANBAN_COLUMNS,
   TODO_TAGS,
-  stickyToneFor,
+  agentFor,
+  getAgent,
+  type AgentId,
   type KanbanColumnId,
   type TagFilter,
   type Todo,
@@ -17,30 +20,35 @@ const SEED_TODOS: Todo[] = [
     title: 'Validate pricing hypothesis',
     status: 'backlog',
     tags: ['Discovery'],
+    agentId: 'scout',
   },
   {
     id: 'seed-empty',
     title: 'Redesign empty states',
     status: 'in_progress',
     tags: ['Design'],
+    agentId: 'nova',
   },
   {
     id: 'seed-auth',
     title: 'Ship auth polish',
     status: 'review',
     tags: ['Engineering'],
+    agentId: 'forge',
   },
   {
     id: 'seed-waitlist',
     title: 'Launch waitlist email',
     status: 'done',
     tags: ['Growth'],
+    agentId: 'atlas',
   },
   {
     id: 'seed-checkout',
     title: 'Fix checkout crash on retry',
     status: 'in_progress',
     tags: ['Bug', 'Engineering'],
+    agentId: 'forge',
   },
 ]
 
@@ -58,6 +66,8 @@ type TasksPageProps = {
   tagFilter?: TagFilter
 }
 
+type AgentChoice = AgentId | 'auto'
+
 function createId() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return `todo-${crypto.randomUUID()}`
@@ -69,11 +79,25 @@ function tagClass(tag: TodoTag) {
   return `tasks__tag tasks__tag--${tag.toLowerCase()}`
 }
 
+function statusCardClass(status: KanbanColumnId) {
+  switch (status) {
+    case 'backlog':
+      return 'tasks__sticky tasks__sticky--queued'
+    case 'in_progress':
+      return 'tasks__sticky tasks__sticky--working'
+    case 'review':
+      return 'tasks__sticky tasks__sticky--review'
+    case 'done':
+      return 'tasks__sticky tasks__sticky--shipped'
+  }
+}
+
 export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
   const reduceMotion = useReducedMotion()
   const [todos, setTodos] = useState<Todo[]>(SEED_TODOS)
   const [draft, setDraft] = useState('')
   const [draftTag, setDraftTag] = useState<TodoTag>('Discovery')
+  const [draftAgent, setDraftAgent] = useState<AgentChoice>('auto')
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dropTarget, setDropTarget] = useState<KanbanColumnId | null>(null)
   const [arrivingId, setArrivingId] = useState<string | null>(null)
@@ -83,6 +107,9 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
     tagFilter === 'all'
       ? todos
       : todos.filter((todo) => todo.tags.includes(tagFilter))
+
+  const workingTodos = visibleTodos.filter((todo) => todo.status === 'in_progress')
+  const activeAgentCount = new Set(workingTodos.map((todo) => todo.agentId)).size
 
   useEffect(() => {
     if (!arrivingId) return
@@ -101,12 +128,16 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
     const title = draft.trim()
     if (!title) return
 
+    const id = createId()
+    const agentId = draftAgent === 'auto' ? agentFor(id).id : draftAgent
+
     setTodos((current) => [
       {
-        id: createId(),
+        id,
         title,
         status: 'backlog',
         tags: [draftTag],
+        agentId,
       },
       ...current,
     ])
@@ -164,32 +195,73 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
   return (
     <div className="tasks">
       <header className="tasks__header">
-        <h1 className="tasks__title">Kanban Board</h1>
+        <h1 className="tasks__title">Mission Control</h1>
         <p className="tasks__hint">
-          Drag sticky notes across Backlog, Doing, Review, and Done. Filter by product tag.
+          Agents claim and move work as they execute. You brief them, review output, and
+          approve what ships.
         </p>
       </header>
 
       <form className="tasks__composer" onSubmit={addTodo}>
+        <p className="tasks__composer-kicker">Brief an agent</p>
         <div className="tasks__composer-title-block">
           <label className="tasks__field-label" htmlFor="new-task">
-            Work item title
+            What should an agent do?
           </label>
           <input
             id="new-task"
             className="tasks__input"
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
-            placeholder="What should the team ship next?"
+            placeholder="Describe the outcome you want an agent to deliver"
             autoComplete="off"
           />
         </div>
 
+        <fieldset className="tasks__agent-assign">
+          <legend className="tasks__field-label">Assign to agent</legend>
+          <div className="tasks__agent-options" role="group" aria-label="Assign to agent">
+            <button
+              type="button"
+              className={
+                draftAgent === 'auto'
+                  ? 'tasks__agent-option tasks__agent-option--selected'
+                  : 'tasks__agent-option'
+              }
+              aria-pressed={draftAgent === 'auto'}
+              onClick={() => setDraftAgent('auto')}
+            >
+              Auto-assign
+            </button>
+            {AGENTS.map((agent) => {
+              const selected = draftAgent === agent.id
+              return (
+                <button
+                  key={agent.id}
+                  type="button"
+                  className={
+                    selected
+                      ? 'tasks__agent-option tasks__agent-option--selected'
+                      : 'tasks__agent-option'
+                  }
+                  aria-pressed={selected}
+                  aria-label={`Assign to ${agent.name}`}
+                  onClick={() => setDraftAgent(agent.id)}
+                >
+                  <span className="tasks__agent-option-avatar" aria-hidden="true">
+                    {agent.initial}
+                  </span>
+                  {agent.name}
+                </button>
+              )
+            })}
+          </div>
+        </fieldset>
+
         <fieldset className="tasks__tagging" aria-describedby="tagging-help">
           <legend className="tasks__tagging-legend">What type of work is this?</legend>
           <p className="tasks__tagging-help" id="tagging-help">
-            Pick a tag that matches the kind of work. You can filter the board by these tags
-            later.
+            Tag the brief so you can filter the board later. Agents still own execution.
           </p>
           <div className="tasks__tag-options">
             {TODO_TAGS.map((tag) => {
@@ -216,7 +288,7 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
         </fieldset>
 
         <button className="tasks__add" type="submit">
-          Add sticky note
+          Dispatch to Agent
         </button>
       </form>
 
@@ -234,6 +306,7 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
               draggingId={draggingId}
               arrivingId={arrivingId}
               isDropTarget={dropTarget === column.id}
+              activeAgentCount={column.id === 'in_progress' ? activeAgentCount : undefined}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               onDragOver={handleDragOver}
@@ -256,13 +329,13 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
 function emptyCopy(column: KanbanColumnId) {
   switch (column) {
     case 'backlog':
-      return 'Park the next bets here.'
+      return 'Briefs waiting for an agent to pick up.'
     case 'in_progress':
-      return 'Drop a sticky note when work starts.'
+      return 'No agents actively executing right now.'
     case 'review':
-      return 'Ready for critique or QA.'
+      return 'Nothing awaiting your approval.'
     case 'done':
-      return 'Shipped work sticks here.'
+      return 'Shipped agent work lands here.'
   }
 }
 
@@ -275,6 +348,7 @@ type KanbanColumnProps = {
   draggingId: string | null
   arrivingId: string | null
   isDropTarget: boolean
+  activeAgentCount?: number
   onDragStart: (event: DragEvent<HTMLLIElement>, id: string) => void
   onDragEnd: () => void
   onDragOver: (event: DragEvent<HTMLElement>, status: KanbanColumnId) => void
@@ -291,6 +365,7 @@ function KanbanColumn({
   draggingId,
   arrivingId,
   isDropTarget,
+  activeAgentCount,
   onDragStart,
   onDragEnd,
   onDragOver,
@@ -309,7 +384,14 @@ function KanbanColumn({
       onDrop={(event) => onDrop(event, status)}
     >
       <div className="tasks__column-head">
-        <h2 className="tasks__column-title">{title}</h2>
+        <div className="tasks__column-head-copy">
+          <h2 className="tasks__column-title">{title}</h2>
+          {typeof activeAgentCount === 'number' && (
+            <p className="tasks__live-agents" data-testid="active-agent-count">
+              {activeAgentCount} agent{activeAgentCount === 1 ? '' : 's'} live
+            </p>
+          )}
+        </div>
         <span className="tasks__count">{todos.length}</span>
       </div>
 
@@ -319,10 +401,9 @@ function KanbanColumn({
         ) : (
           <ul className="tasks__list">
             {todos.map((todo) => {
-              const toneName = stickyToneFor(todo.id)
+              const agent = getAgent(todo.agentId)
               const classes = [
-                'tasks__sticky',
-                `tasks__sticky--${toneName}`,
+                statusCardClass(todo.status),
                 draggingId === todo.id ? 'tasks__sticky--dragging' : '',
                 arrivingId === todo.id ? 'tasks__sticky--arriving' : '',
               ]
@@ -334,10 +415,39 @@ function KanbanColumn({
                   key={todo.id}
                   className={classes}
                   data-todo-id={todo.id}
+                  data-agent={agent.id}
                   draggable
                   onDragStart={(event) => onDragStart(event, todo.id)}
                   onDragEnd={onDragEnd}
                 >
+                  {todo.status === 'in_progress' && (
+                    <span className="tasks__scan" aria-hidden="true" />
+                  )}
+                  <div className="tasks__card-top">
+                    <span
+                      className={`tasks__agent-badge tasks__agent-badge--${agent.id}`}
+                      title={agent.name}
+                    >
+                      <span className="tasks__agent-initial" aria-hidden="true">
+                        {agent.initial}
+                      </span>
+                      <span className="tasks__agent-name">{agent.name}</span>
+                    </span>
+                    {todo.status === 'in_progress' && (
+                      <span className="tasks__progress" aria-hidden="true">
+                        <span className="tasks__progress-dot" />
+                        Executing
+                      </span>
+                    )}
+                    {todo.status === 'review' && (
+                      <span className="tasks__approval-badge">Awaiting your approval</span>
+                    )}
+                    {todo.status === 'done' && (
+                      <span className="tasks__shipped-badge" aria-hidden="true">
+                        ✓
+                      </span>
+                    )}
+                  </div>
                   <p className="tasks__task-title">{todo.title}</p>
                   <ul className="tasks__tags">
                     {todo.tags.map((tag) => (
@@ -382,7 +492,7 @@ function DoneParty({ title, reduceMotion }: DonePartyProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <p className="tasks__party-message">Shipped: {title}</p>
+      <p className="tasks__party-message">Agent shipped: {title}</p>
       {!reduceMotion &&
         pieces.map((piece) => (
           <span

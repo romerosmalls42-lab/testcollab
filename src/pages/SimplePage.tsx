@@ -33,7 +33,7 @@ export function DashboardPage() {
   return (
     <SimplePage
       title="Dashboard"
-      lead="See delivery health across Backlog, Doing, Review, and Done at a glance."
+      lead="See delivery health across Queued, Agents Working, Review, and Shipped at a glance."
     />
   )
 }

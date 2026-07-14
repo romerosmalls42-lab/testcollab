@@ -15,9 +15,9 @@ describe('Tasks app shell', () => {
   it('shows the full-bleed Kanban board on /tasks', () => {
     renderTasks()
 
-    expect(screen.getByRole('heading', { name: /kanban board/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /mission control/i })).toBeInTheDocument()
     expect(screen.getByTestId('kanban-board')).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: /^doing$/i })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /^agents working$/i })).toBeInTheDocument()
     expect(document.querySelector('.tasks__sticky')).toBeTruthy()
   })
 

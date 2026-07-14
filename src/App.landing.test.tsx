@@ -54,7 +54,7 @@ describe('Landing routing', () => {
 
     await user.click(screen.getByRole('link', { name: /deploy your first agent/i }))
 
-    expect(screen.getByRole('heading', { name: /kanban board/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /mission control/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument()
   })
 

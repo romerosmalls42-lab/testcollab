@@ -29,20 +29,38 @@ function createDataTransfer() {
 }
 
 describe('TasksPage Kanban', () => {
-  it('shows a full-bleed Kanban board with sticky-note cards', () => {
+  it('shows Mission Control with agent-state columns', () => {
     renderTasks()
 
-    expect(screen.getByRole('heading', { name: /kanban board/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /mission control/i })).toBeInTheDocument()
     expect(screen.getByTestId('kanban-board')).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: /^backlog$/i })).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: /^doing$/i })).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: /^review$/i })).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: /^done$/i })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /^queued$/i })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /^agents working$/i })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /^needs your review$/i })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /^shipped by agents$/i })).toBeInTheDocument()
 
     const card = screen
       .getByText(/validate pricing hypothesis/i)
       .closest('[data-todo-id]') as HTMLElement
     expect(card).toHaveClass('tasks__sticky')
+    expect(card).toHaveClass('tasks__sticky--queued')
+  })
+
+  it('shows agent presence and live working agent count', () => {
+    renderTasks()
+
+    const workingCard = screen
+      .getByText(/redesign empty states/i)
+      .closest('[data-todo-id]') as HTMLElement
+    expect(within(workingCard).getByText(/^nova$/i)).toBeInTheDocument()
+    expect(workingCard).toHaveClass('tasks__sticky--working')
+
+    const reviewCard = screen
+      .getByText(/ship auth polish/i)
+      .closest('[data-todo-id]') as HTMLElement
+    expect(within(reviewCard).getByText(/awaiting your approval/i)).toBeInTheDocument()
+
+    expect(screen.getByTestId('active-agent-count')).toHaveTextContent(/2 agents live/i)
   })
 
   it('renders tags on work items', () => {
@@ -61,7 +79,7 @@ describe('TasksPage Kanban', () => {
       screen.getByRole('group', { name: /what type of work is this/i }),
     ).toBeInTheDocument()
     expect(
-      screen.getByText(/pick a tag that matches the kind of work/i),
+      screen.getByText(/tag the brief so you can filter the board later/i),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /tag as discovery/i })).toHaveAttribute(
       'aria-pressed',
@@ -71,6 +89,21 @@ describe('TasksPage Kanban', () => {
       'tasks__tag-option--selected',
     )
     expect(screen.getByText(/research & validation/i)).toBeInTheDocument()
+  })
+
+  it('lets you assign or auto-assign an agent when briefing', async () => {
+    const user = userEvent.setup()
+    renderTasks()
+
+    expect(screen.getByRole('button', { name: /^auto-assign$/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await user.click(screen.getByRole('button', { name: /assign to forge/i }))
+    expect(screen.getByRole('button', { name: /assign to forge/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
   })
 
   it('highlights the chosen tag in gold when selected', async () => {
@@ -88,50 +121,56 @@ describe('TasksPage Kanban', () => {
     )
   })
 
-  it('adds a tagged sticky note to Backlog', async () => {
+  it('dispatches a brief into Queued', async () => {
     const user = userEvent.setup()
     renderTasks()
 
-    await user.type(screen.getByLabelText(/work item title/i), 'Map checkout funnel')
+    await user.type(
+      screen.getByLabelText(/what should an agent do/i),
+      'Map checkout funnel',
+    )
     await user.click(screen.getByRole('button', { name: /tag as growth/i }))
-    await user.click(screen.getByRole('button', { name: /^add sticky note$/i }))
+    await user.click(screen.getByRole('button', { name: /assign to scout/i }))
+    await user.click(screen.getByRole('button', { name: /dispatch to agent/i }))
 
-    const backlog = screen.getByRole('region', { name: /^backlog$/i })
-    const card = within(backlog)
+    const queued = screen.getByRole('region', { name: /^queued$/i })
+    const card = within(queued)
       .getByText(/map checkout funnel/i)
       .closest('[data-todo-id]') as HTMLElement
     expect(card).toHaveClass('tasks__sticky')
     expect(within(card).getByText(/^growth$/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/work item title/i)).toHaveValue('')
+    expect(within(card).getByText(/^scout$/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/what should an agent do/i)).toHaveValue('')
   })
 
-  it('drags a sticky note from Backlog into Doing with a move animation', () => {
+  it('drags a sticky note from Queued into Agents Working with a move animation', () => {
     renderTasks()
 
     const card = screen.getByText(/validate pricing hypothesis/i).closest('[data-todo-id]')!
-    const doing = screen.getByRole('region', { name: /^doing$/i })
+    const working = screen.getByRole('region', { name: /^agents working$/i })
     const dataTransfer = createDataTransfer()
 
     fireEvent.dragStart(card, { dataTransfer })
-    fireEvent.dragOver(doing, { dataTransfer })
-    fireEvent.drop(doing, { dataTransfer })
+    fireEvent.dragOver(working, { dataTransfer })
+    fireEvent.drop(working, { dataTransfer })
 
-    const moved = within(doing)
+    const moved = within(working)
       .getByText(/validate pricing hypothesis/i)
       .closest('[data-todo-id]') as HTMLElement
     expect(moved).toHaveClass('tasks__sticky--arriving')
+    expect(moved).toHaveClass('tasks__sticky--working')
     expect(
-      within(screen.getByRole('region', { name: /^backlog$/i })).queryByText(
+      within(screen.getByRole('region', { name: /^queued$/i })).queryByText(
         /validate pricing hypothesis/i,
       ),
     ).not.toBeInTheDocument()
   })
 
-  it('celebrates when a sticky note moves into Done', () => {
+  it('celebrates when a sticky note moves into Shipped by Agents', () => {
     renderTasks()
 
     const card = screen.getByText(/ship auth polish/i).closest('[data-todo-id]')!
-    const done = screen.getByRole('region', { name: /^done$/i })
+    const done = screen.getByRole('region', { name: /^shipped by agents$/i })
     const dataTransfer = createDataTransfer()
 
     fireEvent.dragStart(card, { dataTransfer })
