@@ -101,11 +101,33 @@ export function LandingPage() {
             aria-hidden={activeCard >= 0}
           >
             <motion.div
+              className="landing__lead-panel"
+              data-testid="landing-lead-panel"
+              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <p className="landing__kicker">Built for product teams that ship</p>
+              <ol className="landing__stage-rail" aria-label="Board stages">
+                {ORBIT_CARDS.map((card, index) => (
+                  <li key={card.id} className="landing__stage-rail-item">
+                    <span className="landing__stage-rail-index">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="landing__stage-rail-title">{card.title}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="landing__lede">
+                From first idea to final ship, keep every product decision on one living board.
+              </p>
+            </motion.div>
+            <motion.div
               className="landing__brand"
               role="banner"
               initial={reduceMotion ? false : { opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
             >
               To-Do
             </motion.div>
@@ -113,7 +135,7 @@ export function LandingPage() {
               className="landing__headline"
               initial={reduceMotion ? false : { opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.85, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
             >
               Let To-Do Manage Your Daily Tasks So You Don&apos;t Have To
             </motion.h1>
@@ -121,7 +143,7 @@ export function LandingPage() {
               className="landing__support"
               initial={reduceMotion ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
               The one-stop shop for product teams building amazing products.
             </motion.p>
@@ -129,7 +151,7 @@ export function LandingPage() {
               className="landing__cta-row"
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.75, delay: 0.36, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.75, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <Link className="landing__cta" to="/tasks">
                 Start Product Planning

@@ -38,6 +38,19 @@ describe('LandingPage', () => {
     expect(screen.getByRole('banner')).toHaveTextContent(/^to-?do$/i)
   })
 
+  it('fills the upper hero with a product-team stage rail', () => {
+    renderLanding()
+
+    const panel = screen.getByTestId('landing-lead-panel')
+    expect(panel).toHaveTextContent(/built for product teams that ship/i)
+    expect(panel).toHaveTextContent(/from first idea to final ship/i)
+    expect(screen.getByRole('list', { name: /board stages/i })).toBeInTheDocument()
+    expect(panel).toHaveTextContent(/backlog/i)
+    expect(panel).toHaveTextContent(/doing/i)
+    expect(panel).toHaveTextContent(/review/i)
+    expect(panel).toHaveTextContent(/done/i)
+  })
+
   it('leads with the manage-your-tasks message', () => {
     renderLanding()
 
