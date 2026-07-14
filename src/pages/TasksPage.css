@@ -23,6 +23,8 @@
   margin: 0;
   color: var(--mute);
   font-size: 1rem;
+  max-width: 42rem;
+  line-height: 1.5;
 }
 
 .tasks__composer {
@@ -43,11 +45,12 @@
 
 .tasks__composer-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) 10rem auto;
   gap: 0.65rem;
 }
 
-.tasks__input {
+.tasks__input,
+.tasks__select {
   width: 100%;
   min-height: 3rem;
   padding: 0.75rem 1rem;
@@ -58,7 +61,12 @@
   font-size: 1rem;
 }
 
-.tasks__input:focus {
+.tasks__select {
+  cursor: pointer;
+}
+
+.tasks__input:focus,
+.tasks__select:focus {
   outline: 2px solid #1b3d30;
   outline-offset: 1px;
 }
@@ -81,19 +89,18 @@
   outline: none;
 }
 
-.tasks__board {
+.tasks__board--kanban {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.tasks__board--single {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(4, minmax(14rem, 1fr));
+  gap: 0.85rem;
+  align-items: start;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
 }
 
 .tasks__section {
-  min-height: 16rem;
-  padding: 1rem;
+  min-height: 18rem;
+  padding: 0.9rem;
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid var(--line);
   transition:
@@ -117,7 +124,7 @@
 .tasks__section-title {
   margin: 0;
   font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--ink);
 }
@@ -130,9 +137,9 @@
 
 .tasks__empty {
   margin: 0;
-  padding: 1.25rem 0.25rem;
+  padding: 1rem 0.15rem;
   color: var(--mute);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   line-height: 1.5;
 }
 
@@ -146,10 +153,8 @@
 
 .tasks__item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.7rem 0.75rem;
+  gap: 0.45rem;
+  padding: 0.8rem 0.8rem 0.65rem;
   background: #fffdf8;
   border: 1px solid rgba(15, 47, 36, 0.08);
   cursor: grab;
@@ -163,29 +168,61 @@
   cursor: grabbing;
 }
 
-.tasks__task {
+.tasks__card {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.7rem;
-  align-items: start;
-  cursor: inherit;
-}
-
-.tasks__task input {
-  margin-top: 0.2rem;
-  accent-color: #0f2f24;
+  gap: 0.55rem;
 }
 
 .tasks__task-title {
+  margin: 0;
   color: var(--ink);
   line-height: 1.4;
   word-break: break-word;
+  font-size: 0.98rem;
+  font-weight: 500;
 }
 
-.tasks__task-title--done {
-  color: rgba(15, 47, 36, 0.5);
-  text-decoration: line-through;
-  text-decoration-thickness: 1px;
+.tasks__tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tasks__tag {
+  padding: 0.18rem 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #0f2f24;
+  background: rgba(15, 47, 36, 0.08);
+}
+
+.tasks__tag--discovery {
+  background: rgba(61, 90, 128, 0.16);
+  color: #243652;
+}
+
+.tasks__tag--design {
+  background: rgba(122, 84, 46, 0.16);
+  color: #5a3c1f;
+}
+
+.tasks__tag--engineering {
+  background: rgba(27, 61, 48, 0.16);
+  color: #143226;
+}
+
+.tasks__tag--growth {
+  background: rgba(178, 140, 55, 0.2);
+  color: #6a5318;
+}
+
+.tasks__tag--bug {
+  background: rgba(140, 48, 48, 0.14);
+  color: #6b2626;
 }
 
 .tasks__delete {
@@ -194,10 +231,11 @@
   background: transparent;
   color: var(--mute);
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
-  padding: 0.2rem 0.25rem;
+  padding: 0;
+  justify-self: start;
 }
 
 .tasks__delete:hover,
@@ -206,11 +244,13 @@
   outline: none;
 }
 
-@media (max-width: 720px) {
-  .tasks__board {
-    grid-template-columns: 1fr;
+@media (max-width: 960px) {
+  .tasks__board--kanban {
+    grid-template-columns: repeat(4, minmax(13.5rem, 70vw));
   }
+}
 
+@media (max-width: 720px) {
   .tasks__composer-row {
     grid-template-columns: 1fr;
   }

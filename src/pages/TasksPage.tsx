@@ -1,19 +1,51 @@
 import { useState, type DragEvent, type FormEvent } from 'react'
-import type { Todo, TodoStatus } from '../types/todo'
-import type { TodoFilter } from '../components/Navbar'
+import {
+  KANBAN_COLUMNS,
+  TODO_TAGS,
+  type KanbanColumnId,
+  type TagFilter,
+  type Todo,
+  type TodoTag,
+} from '../types/todo'
 import './TasksPage.css'
 
 const SEED_TODOS: Todo[] = [
-  { id: 'seed-luna', title: 'Draft the brief for Luna', status: 'completed' },
-  { id: 'seed-ship', title: 'Ship the landing polish', status: 'active' },
-  { id: 'seed-harper', title: 'Reply to Harper', status: 'active' },
-  { id: 'seed-review', title: 'Review tomorrow morning', status: 'active' },
+  {
+    id: 'seed-pricing',
+    title: 'Validate pricing hypothesis',
+    status: 'backlog',
+    tags: ['Discovery'],
+  },
+  {
+    id: 'seed-empty',
+    title: 'Redesign empty states',
+    status: 'in_progress',
+    tags: ['Design'],
+  },
+  {
+    id: 'seed-auth',
+    title: 'Ship auth polish',
+    status: 'review',
+    tags: ['Engineering'],
+  },
+  {
+    id: 'seed-waitlist',
+    title: 'Launch waitlist email',
+    status: 'done',
+    tags: ['Growth'],
+  },
+  {
+    id: 'seed-checkout',
+    title: 'Fix checkout crash on retry',
+    status: 'in_progress',
+    tags: ['Bug', 'Engineering'],
+  },
 ]
 
 const TODO_MIME = 'application/x-todo-id'
 
 type TasksPageProps = {
-  filter?: TodoFilter
+  tagFilter?: TagFilter
 }
 
 function createId() {
@@ -23,43 +55,42 @@ function createId() {
   return `todo-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
-export function TasksPage({ filter = 'all' }: TasksPageProps) {
+function tagClass(tag: TodoTag) {
+  return `tasks__tag tasks__tag--${tag.toLowerCase()}`
+}
+
+export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
   const [todos, setTodos] = useState<Todo[]>(SEED_TODOS)
   const [draft, setDraft] = useState('')
+  const [draftTag, setDraftTag] = useState<TodoTag>('Discovery')
   const [draggingId, setDraggingId] = useState<string | null>(null)
-  const [dropTarget, setDropTarget] = useState<TodoStatus | null>(null)
+  const [dropTarget, setDropTarget] = useState<KanbanColumnId | null>(null)
 
-  const activeTodos = todos.filter((todo) => todo.status === 'active')
-  const completedTodos = todos.filter((todo) => todo.status === 'completed')
-
-  const showActive = filter === 'all' || filter === 'active'
-  const showCompleted = filter === 'all' || filter === 'completed'
+  const visibleTodos =
+    tagFilter === 'all'
+      ? todos
+      : todos.filter((todo) => todo.tags.includes(tagFilter))
 
   function addTodo(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const title = draft.trim()
     if (!title) return
 
-    setTodos((current) => [{ id: createId(), title, status: 'active' }, ...current])
+    setTodos((current) => [
+      {
+        id: createId(),
+        title,
+        status: 'backlog',
+        tags: [draftTag],
+      },
+      ...current,
+    ])
     setDraft('')
   }
 
-  function moveTodo(id: string, status: TodoStatus) {
+  function moveTodo(id: string, status: KanbanColumnId) {
     setTodos((current) =>
       current.map((todo) => (todo.id === id ? { ...todo, status } : todo)),
-    )
-  }
-
-  function toggleTodo(id: string) {
-    setTodos((current) =>
-      current.map((todo) =>
-        todo.id === id
-          ? {
-              ...todo,
-              status: todo.status === 'active' ? 'completed' : 'active',
-            }
-          : todo,
-      ),
     )
   }
 
@@ -79,13 +110,13 @@ export function TasksPage({ filter = 'all' }: TasksPageProps) {
     setDropTarget(null)
   }
 
-  function handleDragOver(event: DragEvent<HTMLElement>, status: TodoStatus) {
+  function handleDragOver(event: DragEvent<HTMLElement>, status: KanbanColumnId) {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'move'
     setDropTarget(status)
   }
 
-  function handleDrop(event: DragEvent<HTMLElement>, status: TodoStatus) {
+  function handleDrop(event: DragEvent<HTMLElement>, status: KanbanColumnId) {
     event.preventDefault()
     const id =
       event.dataTransfer.getData(TODO_MIME) || event.dataTransfer.getData('text/plain')
@@ -97,13 +128,18 @@ export function TasksPage({ filter = 'all' }: TasksPageProps) {
   return (
     <div className="tasks">
       <header className="tasks__header">
-        <h1 className="tasks__title">Your list</h1>
-        <p className="tasks__hint">Add a task, then drag it between To do and Done.</p>
+        <h1 className="tasks__title">Product board</h1>
+        <p className="tasks__hint">
+          Track product work across the pipeline. Drag cards between columns. Filter by tag.
+        </p>
       </header>
 
       <form className="tasks__composer" onSubmit={addTodo}>
         <label className="tasks__label" htmlFor="new-task">
-          New task
+          New work item
+        </label>
+        <label className="tasks__label" htmlFor="new-tag">
+          Tag
         </label>
         <div className="tasks__composer-row">
           <input
@@ -111,69 +147,81 @@ export function TasksPage({ filter = 'all' }: TasksPageProps) {
             className="tasks__input"
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
-            placeholder="What needs doing?"
+            placeholder="What should the team ship next?"
             autoComplete="off"
           />
+          <select
+            id="new-tag"
+            className="tasks__select"
+            value={draftTag}
+            onChange={(event) => setDraftTag(event.target.value as TodoTag)}
+            aria-label="Tag"
+          >
+            {TODO_TAGS.map((tag) => (
+              <option key={tag} value={tag}>
+                {tag}
+              </option>
+            ))}
+          </select>
           <button className="tasks__add" type="submit">
             Add
           </button>
         </div>
       </form>
 
-      <div className={filter === 'all' ? 'tasks__board' : 'tasks__board tasks__board--single'}>
-        {showActive && (
-          <TodoSection
-            title="To do"
-            status="active"
-            todos={activeTodos}
-            empty="Nothing here yet. Add a task above."
-            draggingId={draggingId}
-            isDropTarget={dropTarget === 'active'}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-            onToggle={toggleTodo}
-            onDelete={deleteTodo}
-          />
-        )}
-        {showCompleted && (
-          <TodoSection
-            title="Done"
-            status="completed"
-            todos={completedTodos}
-            empty="Finished tasks land here."
-            draggingId={draggingId}
-            isDropTarget={dropTarget === 'completed'}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-            onToggle={toggleTodo}
-            onDelete={deleteTodo}
-          />
-        )}
+      <div className="tasks__board tasks__board--kanban">
+        {KANBAN_COLUMNS.map((column) => {
+          const columnTodos = visibleTodos.filter((todo) => todo.status === column.id)
+          return (
+            <KanbanColumn
+              key={column.id}
+              title={column.title}
+              status={column.id}
+              todos={columnTodos}
+              empty={emptyCopy(column.id)}
+              draggingId={draggingId}
+              isDropTarget={dropTarget === column.id}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onDelete={deleteTodo}
+            />
+          )
+        })}
       </div>
     </div>
   )
 }
 
-type TodoSectionProps = {
+function emptyCopy(column: KanbanColumnId) {
+  switch (column) {
+    case 'backlog':
+      return 'Ideas and next bets land here.'
+    case 'in_progress':
+      return 'Pull a card in when work starts.'
+    case 'review':
+      return 'Ready for critique or QA.'
+    case 'done':
+      return 'Shipped work shows up here.'
+  }
+}
+
+type KanbanColumnProps = {
   title: string
-  status: TodoStatus
+  status: KanbanColumnId
   todos: Todo[]
   empty: string
   draggingId: string | null
   isDropTarget: boolean
   onDragStart: (event: DragEvent<HTMLLIElement>, id: string) => void
   onDragEnd: () => void
-  onDragOver: (event: DragEvent<HTMLElement>, status: TodoStatus) => void
-  onDrop: (event: DragEvent<HTMLElement>, status: TodoStatus) => void
-  onToggle: (id: string) => void
+  onDragOver: (event: DragEvent<HTMLElement>, status: KanbanColumnId) => void
+  onDrop: (event: DragEvent<HTMLElement>, status: KanbanColumnId) => void
   onDelete: (id: string) => void
 }
 
-function TodoSection({
+function KanbanColumn({
   title,
   status,
   todos,
@@ -184,9 +232,8 @@ function TodoSection({
   onDragEnd,
   onDragOver,
   onDrop,
-  onToggle,
   onDelete,
-}: TodoSectionProps) {
+}: KanbanColumnProps) {
   return (
     <section
       className={
@@ -218,23 +265,16 @@ function TodoSection({
               onDragStart={(event) => onDragStart(event, todo.id)}
               onDragEnd={onDragEnd}
             >
-              <label className="tasks__task">
-                <input
-                  type="checkbox"
-                  checked={todo.status === 'completed'}
-                  onChange={() => onToggle(todo.id)}
-                  aria-label={todo.title}
-                />
-                <span
-                  className={
-                    todo.status === 'completed'
-                      ? 'tasks__task-title tasks__task-title--done'
-                      : 'tasks__task-title'
-                  }
-                >
-                  {todo.title}
-                </span>
-              </label>
+              <div className="tasks__card">
+                <p className="tasks__task-title">{todo.title}</p>
+                <ul className="tasks__tags">
+                  {todo.tags.map((tag) => (
+                    <li key={tag} className={tagClass(tag)}>
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <button
                 type="button"
                 className="tasks__delete"

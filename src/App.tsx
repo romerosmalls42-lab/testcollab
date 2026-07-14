@@ -7,33 +7,34 @@ import {
   useLocation,
   useOutletContext,
 } from 'react-router-dom'
-import { Navbar, type TodoFilter } from './components/Navbar'
+import { Navbar } from './components/Navbar'
 import { Footer } from './components/Footer'
 import { AboutPage } from './pages/AboutPage'
 import { LandingPage } from './pages/LandingPage'
 import { TasksPage } from './pages/TasksPage'
+import type { TagFilter } from './types/todo'
 import './components/Navbar.css'
 import './components/Footer.css'
 import './App.css'
 
 type AppShellContext = {
-  filter: TodoFilter
+  tagFilter: TagFilter
 }
 
 function TasksRoute() {
-  const { filter } = useOutletContext<AppShellContext>()
-  return <TasksPage filter={filter} />
+  const { tagFilter } = useOutletContext<AppShellContext>()
+  return <TasksPage tagFilter={tagFilter} />
 }
 
 function AppShell() {
-  const [filter, setFilter] = useState<TodoFilter>('all')
+  const [tagFilter, setTagFilter] = useState<TagFilter>('all')
   const location = useLocation()
   const showFilters = location.pathname === '/tasks'
 
   return (
     <div className={showFilters ? 'app app--tasks' : 'app'}>
       {showFilters ? (
-        <Navbar activeFilter={filter} onFilterChange={setFilter} />
+        <Navbar activeFilter={tagFilter} onFilterChange={setTagFilter} />
       ) : (
         <nav className="navbar" aria-label="Main">
           <Link className="navbar__brand" to="/">
@@ -42,7 +43,7 @@ function AppShell() {
         </nav>
       )}
       <main className="app__main">
-        <Outlet context={{ filter } satisfies AppShellContext} />
+        <Outlet context={{ tagFilter } satisfies AppShellContext} />
       </main>
       <Footer />
     </div>

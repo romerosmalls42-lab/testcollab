@@ -1,16 +1,14 @@
 import { Link } from 'react-router-dom'
-
-export type TodoFilter = 'all' | 'active' | 'completed'
+import { TODO_TAGS, type TagFilter } from '../types/todo'
 
 export type NavbarProps = {
-  activeFilter: TodoFilter
-  onFilterChange: (filter: TodoFilter) => void
+  activeFilter: TagFilter
+  onFilterChange: (filter: TagFilter) => void
 }
 
-const FILTERS: { id: TodoFilter; label: string }[] = [
+const FILTERS: { id: TagFilter; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'active', label: 'Active' },
-  { id: 'completed', label: 'Completed' },
+  ...TODO_TAGS.map((tag) => ({ id: tag, label: tag })),
 ]
 
 export function Navbar({ activeFilter, onFilterChange }: NavbarProps) {
@@ -19,7 +17,7 @@ export function Navbar({ activeFilter, onFilterChange }: NavbarProps) {
       <Link className="navbar__brand" to="/">
         To-Do
       </Link>
-      <div className="navbar__filters" role="group" aria-label="Filter tasks">
+      <div className="navbar__filters" role="group" aria-label="Filter by tag">
         {FILTERS.map(({ id, label }) => (
           <button
             key={id}

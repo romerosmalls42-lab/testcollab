@@ -32,7 +32,7 @@ describe('Landing routing', () => {
 
     await user.click(screen.getByRole('link', { name: /start your list/i }))
 
-    expect(screen.getByRole('heading', { name: /your list/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /product board/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument()
   })
 })
