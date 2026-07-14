@@ -54,13 +54,29 @@ describe('TasksPage Kanban', () => {
     expect(within(card).getByText(/^discovery$/i)).toBeInTheDocument()
   })
 
+  it('explains tagging as choosing a work type', () => {
+    renderTasks()
+
+    expect(
+      screen.getByRole('group', { name: /what type of work is this/i }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/pick a tag that matches the kind of work/i),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /tag as discovery/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(screen.getByText(/research & validation/i)).toBeInTheDocument()
+  })
+
   it('adds a tagged sticky note to Backlog', async () => {
     const user = userEvent.setup()
     renderTasks()
 
-    await user.type(screen.getByLabelText(/new work item/i), 'Map checkout funnel')
-    await user.selectOptions(screen.getByLabelText(/^tag$/i), 'Growth')
-    await user.click(screen.getByRole('button', { name: /^add$/i }))
+    await user.type(screen.getByLabelText(/work item title/i), 'Map checkout funnel')
+    await user.click(screen.getByRole('button', { name: /tag as growth/i }))
+    await user.click(screen.getByRole('button', { name: /^add sticky note$/i }))
 
     const backlog = screen.getByRole('region', { name: /^backlog$/i })
     const card = within(backlog)
@@ -68,7 +84,7 @@ describe('TasksPage Kanban', () => {
       .closest('[data-todo-id]') as HTMLElement
     expect(card).toHaveClass('tasks__sticky')
     expect(within(card).getByText(/^growth$/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/new work item/i)).toHaveValue('')
+    expect(screen.getByLabelText(/work item title/i)).toHaveValue('')
   })
 
   it('drags a sticky note from Backlog into Doing', () => {

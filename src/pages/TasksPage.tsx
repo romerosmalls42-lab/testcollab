@@ -43,6 +43,14 @@ const SEED_TODOS: Todo[] = [
   },
 ]
 
+const TAG_GUIDANCE: Record<TodoTag, string> = {
+  Discovery: 'Research & validation',
+  Design: 'UI & experience',
+  Engineering: 'Build & ship',
+  Growth: 'Acquisition & retention',
+  Bug: 'Fix something broken',
+}
+
 const TODO_MIME = 'application/x-todo-id'
 
 type TasksPageProps = {
@@ -136,13 +144,10 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
       </header>
 
       <form className="tasks__composer" onSubmit={addTodo}>
-        <label className="tasks__label" htmlFor="new-task">
-          New work item
-        </label>
-        <label className="tasks__label" htmlFor="new-tag">
-          Tag
-        </label>
-        <div className="tasks__composer-row">
+        <div className="tasks__composer-title-block">
+          <label className="tasks__field-label" htmlFor="new-task">
+            Work item title
+          </label>
           <input
             id="new-task"
             className="tasks__input"
@@ -151,23 +156,41 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
             placeholder="What should the team ship next?"
             autoComplete="off"
           />
-          <select
-            id="new-tag"
-            className="tasks__select"
-            value={draftTag}
-            onChange={(event) => setDraftTag(event.target.value as TodoTag)}
-            aria-label="Tag"
-          >
-            {TODO_TAGS.map((tag) => (
-              <option key={tag} value={tag}>
-                {tag}
-              </option>
-            ))}
-          </select>
-          <button className="tasks__add" type="submit">
-            Add
-          </button>
         </div>
+
+        <fieldset className="tasks__tagging" aria-describedby="tagging-help">
+          <legend className="tasks__tagging-legend">What type of work is this?</legend>
+          <p className="tasks__tagging-help" id="tagging-help">
+            Pick a tag that matches the kind of work. You can filter the board by these tags
+            later.
+          </p>
+          <div className="tasks__tag-options">
+            {TODO_TAGS.map((tag) => {
+              const selected = draftTag === tag
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  className={
+                    selected
+                      ? `tasks__tag-option tasks__tag-option--${tag.toLowerCase()} tasks__tag-option--selected`
+                      : `tasks__tag-option tasks__tag-option--${tag.toLowerCase()}`
+                  }
+                  aria-pressed={selected}
+                  aria-label={`Tag as ${tag}`}
+                  onClick={() => setDraftTag(tag)}
+                >
+                  <span className="tasks__tag-option-name">{tag}</span>
+                  <span className="tasks__tag-option-desc">{TAG_GUIDANCE[tag]}</span>
+                </button>
+              )
+            })}
+          </div>
+        </fieldset>
+
+        <button className="tasks__add" type="submit">
+          Add sticky note
+        </button>
       </form>
 
       <div className="tasks__board tasks__board--kanban" data-testid="kanban-board">
