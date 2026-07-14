@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Navbar, type TodoFilter } from './components/Navbar'
+import { Footer } from './components/Footer'
 import './components/Navbar.css'
+import './components/Footer.css'
 import './App.css'
 
 function App() {
@@ -15,6 +17,7 @@ function App() {
           Showing <span className="app__filter-label">{filter}</span> tasks.
         </p>
       </main>
+      <Footer />
     </div>
   )
 }
