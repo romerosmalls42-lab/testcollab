@@ -62,4 +62,13 @@ describe('Navbar', () => {
     expect(onFilterChange).toHaveBeenCalledTimes(1)
     expect(onFilterChange).toHaveBeenCalledWith('Growth')
   })
+
+  it('links to the agent channel from the board navbar', () => {
+    renderNavbar()
+
+    expect(screen.getByRole('link', { name: /^channel$/i })).toHaveAttribute(
+      'href',
+      '/channel',
+    )
+  })
 })

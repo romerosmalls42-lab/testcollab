@@ -549,6 +549,12 @@
   animation: sticky-arrive 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.tasks__sticky--focused {
+  outline: 2px solid rgba(212, 175, 55, 0.7);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.12);
+}
+
 @keyframes sticky-arrive {
   0% {
     opacity: 0.35;

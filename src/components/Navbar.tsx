@@ -14,9 +14,14 @@ const FILTERS: { id: TagFilter; label: string }[] = [
 export function Navbar({ activeFilter, onFilterChange }: NavbarProps) {
   return (
     <nav className="navbar" aria-label="Main">
-      <Link className="navbar__brand" to="/">
-        To-Do
-      </Link>
+      <div className="navbar__brand-row">
+        <Link className="navbar__brand" to="/">
+          To-Do
+        </Link>
+        <Link className="navbar__channel" to="/channel">
+          Channel
+        </Link>
+      </div>
       <div className="navbar__filters" role="group" aria-label="Filter board by work type">
         {FILTERS.map(({ id, label }) => (
           <button
