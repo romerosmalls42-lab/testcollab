@@ -12,10 +12,7 @@ function App() {
     <div className="app">
       <Navbar activeFilter={filter} onFilterChange={setFilter} />
       <main className="app__main">
-        <h1 className="app__title">Your tasks</h1>
-        <p className="app__subtitle">
-          Showing <span className="app__filter-label">{filter}</span> tasks.
-        </p>
+        <p className="app__success">It worked!</p>
       </main>
       <Footer />
     </div>

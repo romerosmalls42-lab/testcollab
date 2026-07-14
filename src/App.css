@@ -30,3 +30,15 @@
   color: #0f2f24;
   text-transform: capitalize;
 }
+
+.app__success {
+  margin: 0;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  background: #e6f6ec;
+  color: #1e7d3c;
+  border: 1px solid #b7e4c7;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+}
