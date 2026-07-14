@@ -2,29 +2,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-.app--tasks {
   background: #070707;
-}
-
-.app--tasks .navbar {
-  --nav-bg: #050505;
-  --nav-fg: #f8f1df;
-  --nav-muted: #b7a77a;
-  --nav-accent: #d4af37;
-  --nav-accent-soft: rgba(212, 175, 55, 0.16);
-  background: linear-gradient(180deg, #121212 0%, #050505 100%);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.28);
-}
-
-.app--tasks .navbar__brand {
-  color: #f0d78c;
-}
-
-.app--tasks .navbar__filter--active {
-  color: #111111;
-  background: linear-gradient(180deg, #f0d78c 0%, #d4af37 100%);
+  color: #f8f1df;
 }
 
 .app__main {
@@ -44,33 +23,33 @@
 
 .app__title {
   margin: 0 0 0.5rem;
-  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-family: 'Syne', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: clamp(1.75rem, 3vw, 2.25rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: #0f2f24;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #f0d78c;
 }
 
 .app__subtitle {
   margin: 0;
-  color: #4a6659;
+  color: #b7a77a;
   font-size: 1.05rem;
 }
 
 .app__filter-label {
   font-weight: 600;
-  color: #0f2f24;
+  color: #f0d78c;
   text-transform: capitalize;
 }
 
 .app__success {
   margin: 0;
   padding: 1rem 1.5rem;
-  border-radius: 0.5rem;
-  background: #e6f6ec;
-  color: #1e7d3c;
-  border: 1px solid #b7e4c7;
-  font-size: 1.25rem;
+  border-radius: 0.35rem;
+  background: rgba(212, 175, 55, 0.14);
+  color: #f0d78c;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  font-size: 1.15rem;
   font-weight: 600;
   text-align: center;
 }

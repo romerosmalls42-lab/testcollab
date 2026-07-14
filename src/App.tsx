@@ -35,7 +35,7 @@ function AppShell() {
   const isTasks = location.pathname === '/tasks'
 
   return (
-    <div className={isTasks ? 'app app--tasks' : 'app'}>
+    <div className="app">
       {isTasks ? (
         <Navbar activeFilter={tagFilter} onFilterChange={setTagFilter} />
       ) : (

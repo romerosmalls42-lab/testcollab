@@ -1,33 +1,30 @@
 .footer {
-  --footer-bg: #0f2f24;
-  --footer-fg: #f4f7f5;
-  --footer-muted: #a8c4b8;
-  --footer-accent: #5ddea8;
+  --footer-fg: #f8f1df;
+  --footer-muted: #b7a77a;
+  --footer-accent: #f0d78c;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   margin-top: auto;
-  padding: 1.25rem 1.5rem;
-  background:
-    radial-gradient(circle at 100% 100%, rgba(93, 222, 168, 0.14), transparent 40%),
-    linear-gradient(135deg, #0c241c 0%, #164536 60%, #0f2f24 100%);
+  padding: 1.35rem 1.5rem;
+  background: linear-gradient(180deg, #121212 0%, #050505 100%);
   color: var(--footer-fg);
-  border-top: 1px solid rgba(93, 222, 168, 0.2);
+  border-top: 1px solid rgba(212, 175, 55, 0.28);
 }
 
 .footer__copy {
   margin: 0;
-  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: 0.9rem;
   color: var(--footer-muted);
 }
 
 .footer__brand {
-  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
-  font-weight: 600;
-  color: var(--footer-fg);
+  font-family: 'Syne', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-weight: 700;
+  color: var(--footer-accent);
 }
 
 .footer__nav {
@@ -37,7 +34,7 @@
 }
 
 .footer__link {
-  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--footer-muted);

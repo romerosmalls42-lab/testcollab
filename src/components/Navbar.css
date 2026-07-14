@@ -1,35 +1,33 @@
 .navbar {
-  --nav-bg: #0f2f24;
-  --nav-fg: #f4f7f5;
-  --nav-muted: #a8c4b8;
-  --nav-accent: #5ddea8;
-  --nav-accent-soft: rgba(93, 222, 168, 0.16);
+  --nav-bg: #050505;
+  --nav-fg: #f8f1df;
+  --nav-muted: #b7a77a;
+  --nav-accent: #d4af37;
+  --nav-accent-soft: rgba(212, 175, 55, 0.16);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
   padding: 1rem 1.5rem;
-  background:
-    radial-gradient(circle at 0% 0%, rgba(93, 222, 168, 0.18), transparent 45%),
-    linear-gradient(135deg, #0f2f24 0%, #164536 55%, #0c241c 100%);
+  background: linear-gradient(180deg, #121212 0%, #050505 100%);
   color: var(--nav-fg);
-  border-bottom: 1px solid rgba(93, 222, 168, 0.2);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.28);
 }
 
 .navbar__brand {
-  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-family: 'Syne', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: clamp(1.5rem, 2.5vw, 1.85rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--nav-fg);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #f0d78c;
   text-decoration: none;
   transition: color 160ms ease;
 }
 
 .navbar__brand:hover,
 .navbar__brand:focus-visible {
-  color: var(--nav-accent);
+  color: #fff8e8;
   outline: none;
 }
 
@@ -44,7 +42,7 @@
   border: 0;
   background: transparent;
   color: var(--nav-muted);
-  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: 0.95rem;
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -64,8 +62,8 @@
 }
 
 .navbar__filter--active {
-  color: var(--nav-accent);
-  background: var(--nav-accent-soft);
+  color: #111111;
+  background: linear-gradient(180deg, #f0d78c 0%, #d4af37 100%);
 }
 
 .navbar__filter:active {
