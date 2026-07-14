@@ -63,12 +63,12 @@ describe('Navbar', () => {
     expect(onFilterChange).toHaveBeenCalledWith('Growth')
   })
 
-  it('links to the agent channel from the board navbar', () => {
+  it('links to department standup from the board navbar', () => {
     renderNavbar()
 
-    expect(screen.getByRole('link', { name: /^channel$/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^standup$/i })).toHaveAttribute(
       'href',
-      '/channel',
+      '/standup',
     )
   })
 })

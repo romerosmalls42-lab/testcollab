@@ -1,0 +1,251 @@
+.standup {
+  --dept-engineering: #e0a45a;
+  --dept-design: #d4a0c7;
+  --dept-marketing: #7eb8a2;
+  --dept-sales: #6ea8d9;
+  --dept-operations: #c4b06a;
+  --line: rgba(212, 175, 55, 0.28);
+
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.standup__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.standup__kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.standup__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  color: var(--gold-bright);
+}
+
+.standup__subtitle {
+  margin: 0.55rem 0 0;
+  max-width: 34rem;
+  color: var(--mute);
+  line-height: 1.5;
+}
+
+.standup__link {
+  align-self: flex-start;
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.standup__link:hover,
+.standup__link:focus-visible {
+  border-bottom-color: var(--gold);
+  outline: none;
+}
+
+.standup__layout {
+  display: grid;
+  grid-template-columns: minmax(12rem, 14rem) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.standup__roster,
+.standup__main {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #141414 0%, #0c0c0c 100%);
+}
+
+.standup__roster {
+  padding: 1rem;
+}
+
+.standup__section-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+}
+
+.standup__depts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.standup__dept {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.standup__main {
+  display: flex;
+  flex-direction: column;
+  min-height: 22rem;
+}
+
+.standup__feed {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  max-height: 28rem;
+}
+
+.standup__bubble {
+  max-width: 92%;
+  padding: 0.7rem 0.8rem;
+  background: #121212;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-left: 3px solid color-mix(in srgb, var(--accent, #d4af37) 75%, #d4af37);
+}
+
+.standup__bubble--you {
+  align-self: flex-end;
+  background: rgba(212, 175, 55, 0.1);
+  --accent: #d4af37;
+}
+
+.standup__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.standup__author {
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+}
+
+.standup__time {
+  margin-left: auto;
+  color: var(--mute);
+  font-size: 0.7rem;
+}
+
+.standup__body {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.standup__avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 1.5px solid color-mix(in srgb, var(--accent, #d4af37) 70%, #d4af37);
+  background: color-mix(in srgb, var(--accent, #d4af37) 22%, #121212);
+  color: color-mix(in srgb, var(--accent, #d4af37) 85%, #fff8e8);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.standup__avatar--sm {
+  width: 1.35rem;
+  height: 1.35rem;
+  font-size: 0.68rem;
+}
+
+.standup__avatar[data-department='engineering'],
+.standup__bubble[data-department='engineering'],
+.standup__dept[data-department='engineering'] {
+  --accent: var(--dept-engineering);
+}
+
+.standup__avatar[data-department='design'],
+.standup__bubble[data-department='design'],
+.standup__dept[data-department='design'] {
+  --accent: var(--dept-design);
+}
+
+.standup__avatar[data-department='marketing'],
+.standup__bubble[data-department='marketing'],
+.standup__dept[data-department='marketing'] {
+  --accent: var(--dept-marketing);
+}
+
+.standup__avatar[data-department='sales'],
+.standup__bubble[data-department='sales'],
+.standup__dept[data-department='sales'] {
+  --accent: var(--dept-sales);
+}
+
+.standup__avatar[data-department='operations'],
+.standup__bubble[data-department='operations'],
+.standup__dept[data-department='operations'] {
+  --accent: var(--dept-operations);
+}
+
+.standup__composer {
+  display: flex;
+  gap: 0.55rem;
+  padding: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.standup__input {
+  flex: 1;
+  appearance: none;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: #0a0a0a;
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding: 0.7rem 0.8rem;
+}
+
+.standup__send {
+  appearance: none;
+  border: 1px solid rgba(255, 236, 180, 0.35);
+  background: linear-gradient(180deg, #e1c15a 0%, #d4af37 100%);
+  color: #14100a;
+  font-weight: 600;
+  padding: 0.65rem 0.95rem;
+  cursor: pointer;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 720px) {
+  .standup__layout {
+    grid-template-columns: 1fr;
+  }
+}

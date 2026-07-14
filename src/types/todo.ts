@@ -8,14 +8,29 @@ export const TODO_TAGS = [
 
 export type TodoTag = (typeof TODO_TAGS)[number]
 
-export const AGENTS = [
-  { id: 'scout', name: 'Scout', initial: 'S' },
-  { id: 'forge', name: 'Forge', initial: 'F' },
-  { id: 'nova', name: 'Nova', initial: 'N' },
-  { id: 'atlas', name: 'Atlas', initial: 'A' },
+export const DEPARTMENTS = [
+  { id: 'engineering', name: 'Engineering', initial: 'E' },
+  { id: 'design', name: 'Design', initial: 'D' },
+  { id: 'marketing', name: 'Marketing', initial: 'M' },
+  { id: 'sales', name: 'Sales', initial: 'S' },
+  { id: 'operations', name: 'Operations', initial: 'O' },
 ] as const
 
-export type AgentId = (typeof AGENTS)[number]['id']
+export type DepartmentId = (typeof DEPARTMENTS)[number]['id']
+
+/** @deprecated Use DepartmentId — kept as alias during migration of board copy. */
+export type AgentId = DepartmentId
+
+/** @deprecated Use DEPARTMENTS */
+export const AGENTS = DEPARTMENTS
+
+export const DEPARTMENT_ACCENTS: Record<DepartmentId, string> = {
+  engineering: '#e0a45a',
+  design: '#d4a0c7',
+  marketing: '#7eb8a2',
+  sales: '#6ea8d9',
+  operations: '#c4b06a',
+}
 
 export const KANBAN_COLUMNS = [
   { id: 'backlog', title: 'Queued', tone: 'coral' },
@@ -33,7 +48,7 @@ export type Todo = {
   title: string
   status: KanbanColumnId
   tags: TodoTag[]
-  agentId: AgentId
+  departmentId: DepartmentId
 }
 
 export type TagFilter = 'all' | TodoTag
@@ -50,14 +65,41 @@ export function stickyToneFor(id: string): StickyTone {
   return STICKY_TONES[hash]
 }
 
-export function agentFor(id: string): (typeof AGENTS)[number] {
-  let hash = 0
-  for (let i = 0; i < id.length; i += 1) {
-    hash = (hash + id.charCodeAt(i) * (i + 3)) % AGENTS.length
+/** Map a board tag to the owning department. */
+export function departmentForTag(tag: TodoTag): DepartmentId {
+  switch (tag) {
+    case 'Engineering':
+    case 'Bug':
+      return 'engineering'
+    case 'Design':
+      return 'design'
+    case 'Growth':
+      return 'marketing'
+    case 'Discovery':
+      return 'operations'
   }
-  return AGENTS[hash]
 }
 
+export function departmentForTodo(todo: Pick<Todo, 'tags' | 'departmentId'>): DepartmentId {
+  const primary = todo.tags[0]
+  if (primary) return departmentForTag(primary)
+  return todo.departmentId
+}
+
+export function getDepartment(departmentId: DepartmentId) {
+  return DEPARTMENTS.find((dept) => dept.id === departmentId) ?? DEPARTMENTS[0]
+}
+
+/** @deprecated Use getDepartment */
 export function getAgent(agentId: AgentId) {
-  return AGENTS.find((agent) => agent.id === agentId) ?? AGENTS[0]
+  return getDepartment(agentId)
+}
+
+/** @deprecated Prefer departmentForTag for auto-assign */
+export function agentFor(id: string): (typeof DEPARTMENTS)[number] {
+  let hash = 0
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash + id.charCodeAt(i) * (i + 3)) % DEPARTMENTS.length
+  }
+  return DEPARTMENTS[hash]
 }

@@ -1,202 +1,41 @@
-import { AGENTS, type AgentId, type KanbanColumnId } from './todo'
+import {
+  DEPARTMENTS,
+  KANBAN_COLUMNS,
+  type DepartmentId,
+  type KanbanColumnId,
+  type Todo,
+} from './todo'
 
-export type ChannelAuthorId = 'you' | AgentId
+export type ChannelAuthorId = 'you' | DepartmentId
 
-export type ChannelTopic = {
-  slug: string
-  name: string
-}
+export type TaskMessageKind = 'chat' | 'status' | 'system'
 
-export type BoardLink = {
-  todoId: string
-  title: string
-  status: KanbanColumnId
-  agentId?: AgentId
-}
-
-export type BoardTask = BoardLink & {
-  agentId: AgentId
-}
-
-export type AgentPresenceStatus = 'idle' | 'working' | 'away'
-
-export type AgentPresence = {
-  status: AgentPresenceStatus
-  taskTitle?: string
-}
-
-export type ChannelMessageKind = 'chat' | 'system' | 'meeting'
-
-export type ChannelMessage = {
+export type TaskMessage = {
   id: string
-  topicSlug: string
+  todoId: string
   authorId: ChannelAuthorId
   body: string
-  kind: ChannelMessageKind
+  kind: TaskMessageKind
   createdAt: string
-  boardLink?: BoardLink
-  meetingId?: string
+  statusChange?: {
+    from: KanbanColumnId
+    to: KanbanColumnId
+  }
 }
 
-export type MeetingStatus = 'scheduled' | 'live' | 'ended'
-
-export type ChannelMeeting = {
+export type StandupMessage = {
   id: string
-  title: string
-  topicSlug: string
-  participantIds: ChannelAuthorId[]
-  status: MeetingStatus
-  startedAt: string
+  authorId: ChannelAuthorId
+  body: string
+  kind: 'chat' | 'system'
+  createdAt: string
 }
-
-/** Distinct accents inside the gold/black system — Slack-style teammate identity. */
-export const AGENT_ACCENTS: Record<AgentId, string> = {
-  scout: '#6ea8d9',
-  forge: '#e0a45a',
-  nova: '#d4a0c7',
-  atlas: '#7eb8a2',
-}
-
-export const CHANNEL_TOPICS: ChannelTopic[] = [
-  { slug: 'general', name: 'General' },
-  { slug: 'revisions', name: 'Revisions' },
-  { slug: 'standup', name: 'Standup' },
-]
-
-export const BOARD_TASKS: BoardTask[] = [
-  {
-    todoId: 'seed-pricing',
-    title: 'Validate pricing hypothesis',
-    status: 'backlog',
-    agentId: 'scout',
-  },
-  {
-    todoId: 'seed-empty',
-    title: 'Redesign empty states',
-    status: 'in_progress',
-    agentId: 'nova',
-  },
-  {
-    todoId: 'seed-auth',
-    title: 'Ship auth polish',
-    status: 'review',
-    agentId: 'forge',
-  },
-  {
-    todoId: 'seed-waitlist',
-    title: 'Launch waitlist email',
-    status: 'done',
-    agentId: 'atlas',
-  },
-  {
-    todoId: 'seed-checkout',
-    title: 'Fix checkout crash on retry',
-    status: 'in_progress',
-    agentId: 'forge',
-  },
-]
-
-/** @deprecated Prefer BOARD_TASKS — kept for call sites that only need discussable items. */
-export const DISCUSSABLE_BOARD_ITEMS: BoardLink[] = BOARD_TASKS
 
 function createId(prefix: string) {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return `${prefix}-${crypto.randomUUID()}`
   }
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
-}
-
-export function boardDeepLink(todoId: string) {
-  return `/tasks?focus=${encodeURIComponent(todoId)}`
-}
-
-export function createBoardLink(input: BoardLink): BoardLink {
-  return {
-    todoId: input.todoId,
-    title: input.title,
-    status: input.status,
-    agentId: input.agentId,
-  }
-}
-
-export function createTopic(input: { name: string; slug: string }): ChannelTopic {
-  return {
-    name: input.name.trim(),
-    slug: input.slug.trim().toLowerCase().replace(/\s+/g, '-'),
-  }
-}
-
-export function createChannelMessage(input: {
-  topicSlug: string
-  authorId: ChannelAuthorId
-  body: string
-  kind?: ChannelMessageKind
-  boardLink?: BoardLink
-  meetingId?: string
-  createdAt?: string
-}): ChannelMessage {
-  return {
-    id: createId('msg'),
-    topicSlug: input.topicSlug,
-    authorId: input.authorId,
-    body: input.body.trim(),
-    kind: input.kind ?? 'chat',
-    createdAt: input.createdAt ?? new Date().toISOString(),
-    boardLink: input.boardLink,
-    meetingId: input.meetingId,
-  }
-}
-
-export function createMeeting(input: {
-  title: string
-  topicSlug: string
-  participantIds: ChannelAuthorId[]
-  status?: MeetingStatus
-}): ChannelMeeting {
-  return {
-    id: createId('meet'),
-    title: input.title.trim(),
-    topicSlug: input.topicSlug,
-    participantIds: input.participantIds,
-    status: input.status ?? 'live',
-    startedAt: new Date().toISOString(),
-  }
-}
-
-const AGENT_REPLY_TEMPLATES: Record<AgentId, (title: string) => string> = {
-  scout: (title) =>
-    `Scout here — I'll dig into "${title}" and surface findings for revision.`,
-  forge: (title) =>
-    `Forge on it. I'll harden the implementation behind "${title}" and ping when ready for review.`,
-  nova: (title) =>
-    `Nova reviewing "${title}". I'll polish the empty-state experience and push an update for revision.`,
-  atlas: (title) =>
-    `Atlas tracking "${title}". I'll sync growth implications and drop notes after review.`,
-}
-
-export function replyAsAgent(input: {
-  agentId: AgentId
-  topicSlug: string
-  aboutTitle: string
-  boardLink?: BoardLink
-}): ChannelMessage {
-  const template = AGENT_REPLY_TEMPLATES[input.agentId]
-  return createChannelMessage({
-    topicSlug: input.topicSlug,
-    authorId: input.agentId,
-    body: template(input.aboutTitle),
-    boardLink: input.boardLink,
-  })
-}
-
-export function authorLabel(authorId: ChannelAuthorId) {
-  if (authorId === 'you') return 'You'
-  return AGENTS.find((agent) => agent.id === authorId)?.name ?? authorId
-}
-
-export function authorInitial(authorId: ChannelAuthorId) {
-  if (authorId === 'you') return 'Y'
-  return AGENTS.find((agent) => agent.id === authorId)?.initial ?? '?'
 }
 
 export function formatMessageTime(iso: string) {
@@ -209,48 +48,130 @@ export function formatMessageTime(iso: string) {
 }
 
 export function formatStatusLabel(status: KanbanColumnId) {
-  switch (status) {
-    case 'backlog':
-      return 'Queued'
-    case 'in_progress':
-      return 'Agents Working'
-    case 'review':
-      return 'Needs Review'
-    case 'done':
-      return 'Shipped'
+  return KANBAN_COLUMNS.find((column) => column.id === status)?.title ?? status
+}
+
+export function authorLabel(authorId: ChannelAuthorId) {
+  if (authorId === 'you') return 'You'
+  return DEPARTMENTS.find((dept) => dept.id === authorId)?.name ?? authorId
+}
+
+export function authorInitial(authorId: ChannelAuthorId) {
+  if (authorId === 'you') return 'Y'
+  return DEPARTMENTS.find((dept) => dept.id === authorId)?.initial ?? '?'
+}
+
+export function createTaskMessage(input: {
+  todoId: string
+  authorId: ChannelAuthorId
+  body: string
+  kind?: TaskMessageKind
+  createdAt?: string
+  statusChange?: TaskMessage['statusChange']
+}): TaskMessage {
+  return {
+    id: createId('msg'),
+    todoId: input.todoId,
+    authorId: input.authorId,
+    body: input.body.trim(),
+    kind: input.kind ?? 'chat',
+    createdAt: input.createdAt ?? new Date().toISOString(),
+    statusChange: input.statusChange,
   }
 }
 
-export function deriveAgentPresence(
-  agentId: AgentId,
-  board: BoardTask[] = BOARD_TASKS,
-): AgentPresence {
-  const owned = board.filter((task) => task.agentId === agentId)
-  const working = owned.find((task) => task.status === 'in_progress')
-  if (working) {
-    return { status: 'working', taskTitle: working.title }
+export function createStatusChangeMessage(input: {
+  todoId: string
+  departmentId: DepartmentId
+  from: KanbanColumnId
+  to: KanbanColumnId
+}): TaskMessage {
+  const dept = authorLabel(input.departmentId)
+  const toLabel = formatStatusLabel(input.to)
+  return createTaskMessage({
+    todoId: input.todoId,
+    authorId: input.departmentId,
+    body: `${dept} moved this task to ${toLabel}`,
+    kind: 'status',
+    statusChange: { from: input.from, to: input.to },
+  })
+}
+
+const DEPARTMENT_REPLY: Record<DepartmentId, (title: string) => string> = {
+  engineering: (title) =>
+    `Engineering on it. We'll harden the implementation behind "${title}" and ping when ready for review.`,
+  design: (title) =>
+    `Design reviewing "${title}". We'll polish the experience and push an update for revision.`,
+  marketing: (title) =>
+    `Marketing tracking "${title}". We'll sync growth copy and drop notes after review.`,
+  sales: (title) =>
+    `Sales on "${title}". We'll advance outreach and report pipeline movement.`,
+  operations: (title) =>
+    `Operations here — coordinating on "${title}" and surfacing anything that needs a decision.`,
+}
+
+export function replyAsDepartment(input: {
+  departmentId: DepartmentId
+  todoId: string
+  title: string
+}): TaskMessage {
+  return createTaskMessage({
+    todoId: input.todoId,
+    authorId: input.departmentId,
+    body: DEPARTMENT_REPLY[input.departmentId](input.title),
+  })
+}
+
+/** When a department commits in chat, advance the task toward review when appropriate. */
+export function nextStatusAfterCommitment(
+  current: KanbanColumnId,
+): KanbanColumnId | null {
+  if (current === 'backlog') return 'in_progress'
+  if (current === 'in_progress') return 'review'
+  return null
+}
+
+export function seedMessagesForTodo(todo: Todo): TaskMessage[] {
+  const dept = todo.departmentId
+  return [
+    createTaskMessage({
+      todoId: todo.id,
+      authorId: dept,
+      body: `${authorLabel(dept)} is assigned to this task. Message us here for discussion or revision asks.`,
+      createdAt: '2026-07-14T12:00:00.000Z',
+    }),
+  ]
+}
+
+export function createStandupMessage(input: {
+  authorId: ChannelAuthorId
+  body: string
+  kind?: StandupMessage['kind']
+  createdAt?: string
+}): StandupMessage {
+  return {
+    id: createId('standup'),
+    authorId: input.authorId,
+    body: input.body.trim(),
+    kind: input.kind ?? 'chat',
+    createdAt: input.createdAt ?? new Date().toISOString(),
   }
-
-  const hasOnlyShipped =
-    owned.length > 0 && owned.every((task) => task.status === 'done')
-  if (hasOnlyShipped) {
-    return { status: 'away' }
-  }
-
-  return { status: 'idle' }
 }
 
-export function activeBoardTasks(board: BoardTask[] = BOARD_TASKS) {
-  return board.filter((task) => task.status === 'in_progress')
-}
-
-export function filterBoardTasks(query: string, board: BoardTask[] = BOARD_TASKS) {
-  const needle = query.trim().toLowerCase()
-  if (!needle) return board
-  return board.filter(
-    (task) =>
-      task.title.toLowerCase().includes(needle) ||
-      task.status.toLowerCase().includes(needle) ||
-      task.agentId.toLowerCase().includes(needle),
-  )
-}
+export const SEED_STANDUP_MESSAGES: StandupMessage[] = [
+  createStandupMessage({
+    authorId: 'operations',
+    body: 'Department standup is open. Share blockers or wins — this is cross-team, not tied to a single board card.',
+    createdAt: '2026-07-14T12:00:00.000Z',
+  }),
+  createStandupMessage({
+    authorId: 'engineering',
+    body: 'Checkout crash fix is in progress; auth polish is waiting on your review.',
+    createdAt: '2026-07-14T12:05:00.000Z',
+  }),
+  createStandupMessage({
+    authorId: 'design',
+    body: 'Empty-state redesign is mid-polish — ping Design on that card if copy needs another pass.',
+    createdAt: '2026-07-14T12:08:00.000Z',
+  }),
+]
