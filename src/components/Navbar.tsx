@@ -17,7 +17,7 @@ export function Navbar({ activeFilter, onFilterChange }: NavbarProps) {
       <Link className="navbar__brand" to="/">
         To-Do
       </Link>
-      <div className="navbar__filters" role="group" aria-label="Filter by tag">
+      <div className="navbar__filters" role="group" aria-label="Filter board by work type">
         {FILTERS.map(({ id, label }) => (
           <button
             key={id}
