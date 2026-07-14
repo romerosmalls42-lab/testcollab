@@ -38,10 +38,12 @@ describe('Landing routing', () => {
         name: /let to-do manage your daily tasks so you don't have to/i,
       }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /start your list/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: /start product planning/i }),
+    ).toBeInTheDocument()
   })
 
-  it('takes Start your list into the To-Do app', async () => {
+  it('takes Start Product Planning into the To-Do app', async () => {
     const user = userEvent.setup()
 
     render(
@@ -50,7 +52,7 @@ describe('Landing routing', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('link', { name: /start your list/i }))
+    await user.click(screen.getByRole('link', { name: /start product planning/i }))
 
     expect(screen.getByRole('heading', { name: /kanban board/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument()
@@ -67,7 +69,7 @@ describe('Landing routing', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('link', { name: /start your list/i }))
+    await user.click(screen.getByRole('link', { name: /start product planning/i }))
 
     expect(scrollTo).toHaveBeenCalledWith(0, 0)
   })

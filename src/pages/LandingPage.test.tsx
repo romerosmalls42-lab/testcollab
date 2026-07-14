@@ -57,13 +57,12 @@ describe('LandingPage', () => {
     ).toBeInTheDocument()
   })
 
-  it('has a clear CTA that starts the To-Do app', () => {
+  it('has a clear CTA that starts product planning', () => {
     renderLanding()
 
-    expect(screen.getByRole('link', { name: /start your list/i })).toHaveAttribute(
-      'href',
-      '/tasks',
-    )
+    expect(
+      screen.getByRole('link', { name: /start product planning/i }),
+    ).toHaveAttribute('href', '/tasks')
   })
 
   it('renders a parallax stage with four orbiting board cards', () => {
@@ -108,6 +107,19 @@ describe('LandingPage', () => {
     expect(screen.getByRole('link', { name: /^dashboard$/i })).toHaveAttribute(
       'href',
       '/dashboard',
+    )
+  })
+
+  it('includes the site footer on the landing page', () => {
+    renderLanding()
+
+    const footer = screen.getByRole('contentinfo')
+    expect(footer).toBeInTheDocument()
+    expect(footer).toHaveTextContent(/to-?do/i)
+    expect(screen.getByRole('link', { name: /^about$/i })).toHaveAttribute('href', '/about')
+    expect(screen.getByRole('link', { name: /^privacy$/i })).toHaveAttribute(
+      'href',
+      '/privacy',
     )
   })
 })

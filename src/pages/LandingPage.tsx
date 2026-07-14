@@ -103,7 +103,7 @@ export function LandingPage() {
               transition={{ duration: 0.75, delay: 0.36, ease: [0.22, 1, 0.36, 1] }}
             >
               <Link className="landing__cta" to="/tasks">
-                Start your list
+                Start Product Planning
               </Link>
             </motion.div>
             <motion.p className="landing__scroll-hint" style={{ opacity: hintOpacity }}>

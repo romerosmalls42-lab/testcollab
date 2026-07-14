@@ -4,11 +4,14 @@
   --gold: #d4af37;
   --gold-bright: #f0d78c;
   --mute: rgba(248, 241, 223, 0.72);
+  --font-display: 'Syne', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
 
   position: relative;
   min-height: 100vh;
   color: var(--ink);
   background: var(--paper);
+  font-family: var(--font-body);
 }
 
 .landing__scroll-track {
@@ -69,10 +72,10 @@
 
 .landing__brand {
   margin: 0 0 1.15rem;
-  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-family: var(--font-display);
   font-size: clamp(3.1rem, 8vw, 5.4rem);
-  font-weight: 600;
-  letter-spacing: -0.045em;
+  font-weight: 700;
+  letter-spacing: -0.05em;
   line-height: 0.88;
   color: var(--gold-bright);
 }
@@ -80,10 +83,10 @@
 .landing__headline {
   margin: 0 0 1rem;
   max-width: 16ch;
-  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.55rem, 3.4vw, 2.35rem);
-  font-weight: 560;
-  letter-spacing: -0.025em;
+  font-weight: 600;
+  letter-spacing: -0.035em;
   line-height: 1.12;
   color: #fff8e8;
 }
@@ -91,8 +94,9 @@
 .landing__support {
   margin: 0 0 1.75rem;
   max-width: 36ch;
-  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   font-size: clamp(1rem, 1.5vw, 1.12rem);
+  font-weight: 500;
   line-height: 1.55;
   color: rgba(248, 241, 223, 0.78);
 }
@@ -112,7 +116,7 @@
   padding: 0.75rem 1.35rem;
   background: linear-gradient(180deg, #f0d78c 0%, #d4af37 100%);
   color: #111111;
-  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -135,31 +139,62 @@
 
 .landing__scroll-hint {
   margin: 1.35rem 0 0;
-  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(240, 215, 140, 0.72);
+}
+
+.landing .landing-nav__brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.landing .landing-nav__link {
+  font-family: var(--font-body);
+}
+
+.landing .hero3d__benefit {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.landing .hero3d__benefit--compact,
+.landing .hero3d__card-chrome,
+.landing .hero3d__label {
+  font-family: var(--font-body);
 }
 
 .landing .footer {
   position: relative;
   z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.75rem clamp(1.25rem, 4vw, 2.5rem);
   background: linear-gradient(180deg, #121212 0%, #050505 100%);
   border-top: 1px solid rgba(212, 175, 55, 0.28);
   color: #f8f1df;
 }
 
 .landing .footer__copy {
+  margin: 0;
+  font-family: var(--font-body);
   color: #b7a77a;
 }
 
 .landing .footer__brand {
+  font-family: var(--font-display);
+  font-weight: 700;
   color: #f0d78c;
 }
 
 .landing .footer__link {
+  font-family: var(--font-body);
   color: #b7a77a;
 }
 
@@ -187,5 +222,10 @@
 
   .landing__headline {
     max-width: 18ch;
+  }
+
+  .landing .footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
