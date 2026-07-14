@@ -237,29 +237,90 @@ export function Hero3D({ reducedMotion, activeCard = -1 }: Hero3DProps) {
               className="hero3d__featured"
               data-testid="todo-featured-card"
               data-column={featured.id}
+              data-animate="pop-in"
               initial={
                 shouldReduce
-                  ? { opacity: 1, scale: 1 }
-                  : { opacity: 0, scale: 0.55, y: 80, rotateX: 18, rotateY: -12 }
+                  ? { opacity: 1, scale: 1, x: 0 }
+                  : {
+                      opacity: 0,
+                      scale: 0.42,
+                      x: 140,
+                      y: 36,
+                      rotateY: -32,
+                      rotateX: 14,
+                      filter: 'blur(8px)',
+                    }
               }
-              animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0, rotateY: 0 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                x: 0,
+                y: 0,
+                rotateY: 0,
+                rotateX: 0,
+                filter: 'blur(0px)',
+              }}
               exit={
                 shouldReduce
                   ? { opacity: 0 }
-                  : { opacity: 0, scale: 0.7, y: -40, rotateX: -8 }
+                  : {
+                      opacity: 0,
+                      scale: 0.78,
+                      x: -48,
+                      y: -24,
+                      rotateY: 12,
+                      filter: 'blur(4px)',
+                    }
               }
-              transition={{ duration: shouldReduce ? 0.2 : 0.65, ease: [0.22, 1, 0.36, 1] }}
+              transition={
+                shouldReduce
+                  ? { duration: 0.15 }
+                  : { type: 'spring', stiffness: 280, damping: 22, mass: 0.75 }
+              }
             >
-              <div className="hero3d__card-chrome hero3d__card-chrome--primary">
+              <motion.div
+                className="hero3d__card-chrome hero3d__card-chrome--primary"
+                initial={shouldReduce ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: shouldReduce ? 0 : 0.08, duration: 0.35 }}
+              >
                 <span>{featured.title}</span>
                 <span>{featured.meta}</span>
-              </div>
-              <p className="hero3d__benefit">{featured.benefit}</p>
-              <ul className="hero3d__task-list">
+              </motion.div>
+              <motion.p
+                className="hero3d__benefit"
+                initial={shouldReduce ? false : { opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: shouldReduce ? 0 : 0.14, duration: 0.4 }}
+              >
+                {featured.benefit}
+              </motion.p>
+              <motion.ul
+                className="hero3d__task-list"
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: {
+                      staggerChildren: shouldReduce ? 0 : 0.07,
+                      delayChildren: shouldReduce ? 0 : 0.2,
+                    },
+                  },
+                }}
+              >
                 {featured.tasks.map((task) => (
-                  <li
+                  <motion.li
                     key={task.id}
-                    className={task.done ? 'hero3d__task hero3d__task--done' : 'hero3d__task'}
+                    className={
+                      task.done ? 'hero3d__task hero3d__task--done' : 'hero3d__task'
+                    }
+                    variants={{
+                      hidden: shouldReduce
+                        ? { opacity: 1, x: 0 }
+                        : { opacity: 0, x: 16 },
+                      show: { opacity: 1, x: 0 },
+                    }}
                   >
                     <span
                       className={
@@ -267,9 +328,9 @@ export function Hero3D({ reducedMotion, activeCard = -1 }: Hero3DProps) {
                       }
                     />
                     <span className="hero3d__label">{task.label}</span>
-                  </li>
+                  </motion.li>
                 ))}
-              </ul>
+              </motion.ul>
             </motion.article>
           )}
         </AnimatePresence>

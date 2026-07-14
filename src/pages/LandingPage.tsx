@@ -5,6 +5,7 @@ import {
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
+  useSpring,
   useTransform,
 } from 'framer-motion'
 import { Hero3D, ORBIT_CARDS } from '../components/Hero3D'
@@ -13,11 +14,12 @@ import '../components/Hero3D.css'
 import '../components/Footer.css'
 import './LandingPage.css'
 
-function activeCardFromProgress(progress: number) {
-  if (progress < 0.14) return -1
-  if (progress < 0.36) return 0
-  if (progress < 0.58) return 1
-  if (progress < 0.8) return 2
+/** Maps sticky-scroll progress to which board card is featured (-1 = intro). */
+export function activeCardFromProgress(progress: number) {
+  if (progress < 0.08) return -1
+  if (progress < 0.26) return 0
+  if (progress < 0.48) return 1
+  if (progress < 0.7) return 2
   return 3
 }
 
@@ -31,20 +33,33 @@ export function LandingPage() {
     offset: ['start start', 'end end'],
   })
 
-  useMotionValueEvent(scrollYProgress, 'change', (value) => {
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    mass: 0.35,
+    restDelta: 0.001,
+  })
+
+  useMotionValueEvent(smoothProgress, 'change', (value) => {
     setActiveCard(activeCardFromProgress(value))
   })
 
   const introOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.1, 0.18],
+    smoothProgress,
+    [0, 0.05, 0.1],
     [1, 1, reduceMotion ? 0.35 : 0],
   )
-  const introY = useTransform(scrollYProgress, [0, 0.2], [0, reduceMotion ? 0 : -36])
+  const introY = useTransform(smoothProgress, [0, 0.12], [0, reduceMotion ? 0 : -28])
+  const hintOpacity = useTransform(smoothProgress, [0, 0.04, 0.1], [1, 1, 0])
 
   return (
     <div className="landing" data-testid="parallax-landing">
-      <div className="landing__scroll-track" data-testid="landing-scroll-track" ref={trackRef}>
+      <div
+        className="landing__scroll-track"
+        data-testid="landing-scroll-track"
+        data-scroll-pace="snappy"
+        ref={trackRef}
+      >
         <div className="landing__sticky">
           <Hero3D activeCard={activeCard} />
           <div className="landing__hero-veil" />
@@ -88,6 +103,9 @@ export function LandingPage() {
                 Start your list
               </Link>
             </motion.div>
+            <motion.p className="landing__scroll-hint" style={{ opacity: hintOpacity }}>
+              Scroll to explore the board
+            </motion.p>
           </motion.div>
         </div>
 
