@@ -1,0 +1,303 @@
+.task-channel {
+  --dept-you: #d4af37;
+  --dept-engineering: #e0a45a;
+  --dept-design: #d4a0c7;
+  --dept-marketing: #7eb8a2;
+  --dept-sales: #6ea8d9;
+  --dept-operations: #c4b06a;
+  --line: rgba(212, 175, 55, 0.28);
+
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.task-channel__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+
+.task-channel__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(26rem, 100%);
+  height: 100%;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(212, 175, 55, 0.1), transparent 34%),
+    linear-gradient(180deg, #121212 0%, #070707 100%);
+  border-left: 1px solid var(--line);
+  box-shadow: -18px 0 48px rgba(0, 0, 0, 0.45);
+  animation: task-channel-in 220ms ease-out;
+}
+
+.task-channel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.15rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.task-channel__kicker {
+  margin: 0 0 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.task-channel__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  color: var(--gold-bright);
+}
+
+.task-channel__dept {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.65rem 0 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.task-channel__messaging {
+  margin: 0.45rem 0 0;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--gold-bright);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.task-channel__status-line {
+  margin: 0.55rem 0 0;
+  color: var(--mute);
+  font-size: 0.85rem;
+}
+
+.task-channel__status-pill {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.task-channel__close,
+.task-channel__send {
+  appearance: none;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.55rem 0.8rem;
+}
+
+.task-channel__send {
+  background: linear-gradient(180deg, #e1c15a 0%, #d4af37 100%);
+  color: #14100a;
+  border-color: rgba(255, 236, 180, 0.35);
+}
+
+.task-channel__close:hover,
+.task-channel__close:focus-visible,
+.task-channel__send:hover,
+.task-channel__send:focus-visible {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.task-channel__feed {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  min-height: 0;
+}
+
+.task-channel__bubble {
+  max-width: 95%;
+  padding: 0.7rem 0.8rem;
+  background: #141414;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-left: 3px solid color-mix(in srgb, var(--accent, #d4af37) 75%, #d4af37);
+}
+
+.task-channel__bubble--you {
+  align-self: flex-end;
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.35);
+  --accent: var(--dept-you);
+}
+
+.task-channel__bubble--status {
+  align-self: center;
+  text-align: center;
+  background: transparent;
+  border-style: dashed;
+  border-left-style: dashed;
+  color: var(--mute);
+  font-size: 0.9rem;
+}
+
+.task-channel__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.task-channel__author {
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+}
+
+.task-channel__time {
+  margin-left: auto;
+  color: var(--mute);
+  font-size: 0.7rem;
+}
+
+.task-channel__body {
+  margin: 0;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.task-channel__status-event {
+  margin: 0.35rem 0 0;
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.task-channel__avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 1.5px solid color-mix(in srgb, var(--accent, #d4af37) 70%, #d4af37);
+  background: color-mix(in srgb, var(--accent, #d4af37) 22%, #121212);
+  color: color-mix(in srgb, var(--accent, #d4af37) 85%, #fff8e8);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.task-channel__avatar--sm {
+  width: 1.35rem;
+  height: 1.35rem;
+  font-size: 0.68rem;
+}
+
+.task-channel__avatar[data-department='you'],
+.task-channel__bubble[data-department='you'] {
+  --accent: var(--dept-you);
+}
+
+.task-channel__avatar[data-department='engineering'],
+.task-channel__bubble[data-department='engineering'],
+.task-channel__dept[data-department='engineering'] {
+  --accent: var(--dept-engineering);
+}
+
+.task-channel__avatar[data-department='design'],
+.task-channel__bubble[data-department='design'],
+.task-channel__dept[data-department='design'] {
+  --accent: var(--dept-design);
+}
+
+.task-channel__avatar[data-department='marketing'],
+.task-channel__bubble[data-department='marketing'],
+.task-channel__dept[data-department='marketing'] {
+  --accent: var(--dept-marketing);
+}
+
+.task-channel__avatar[data-department='sales'],
+.task-channel__bubble[data-department='sales'],
+.task-channel__dept[data-department='sales'] {
+  --accent: var(--dept-sales);
+}
+
+.task-channel__avatar[data-department='operations'],
+.task-channel__bubble[data-department='operations'],
+.task-channel__dept[data-department='operations'] {
+  --accent: var(--dept-operations);
+}
+
+.task-channel__composer {
+  display: flex;
+  gap: 0.55rem;
+  padding: 0.9rem 1rem 1.1rem;
+  border-top: 1px solid var(--line);
+  background: #0d0d0d;
+}
+
+.task-channel__input {
+  flex: 1;
+  appearance: none;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: #0a0a0a;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.7rem 0.8rem;
+}
+
+.task-channel__input:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, 0.45);
+  outline-offset: 1px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes task-channel-in {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-channel__panel {
+    animation: none;
+  }
+}

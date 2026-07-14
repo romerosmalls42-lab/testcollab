@@ -1,145 +1,83 @@
 import { describe, it, expect } from 'vitest'
 import {
-  AGENT_ACCENTS,
-  BOARD_TASKS,
-  CHANNEL_TOPICS,
-  createBoardLink,
-  createChannelMessage,
-  createMeeting,
-  createTopic,
-  boardDeepLink,
-  deriveAgentPresence,
+  createStatusChangeMessage,
+  createTaskMessage,
   formatMessageTime,
   formatStatusLabel,
-  replyAsAgent,
+  nextStatusAfterCommitment,
+  replyAsDepartment,
 } from './channel'
+import {
+  DEPARTMENT_ACCENTS,
+  DEPARTMENTS,
+  departmentForTag,
+} from './todo'
 
-describe('channel types and helpers', () => {
-  it('exposes default topics for group discussion', () => {
-    expect(CHANNEL_TOPICS.map((t) => t.slug)).toEqual([
-      'general',
-      'revisions',
-      'standup',
+describe('department and task channel helpers', () => {
+  it('exposes functional departments instead of persona names', () => {
+    expect(DEPARTMENTS.map((d) => d.id)).toEqual([
+      'engineering',
+      'design',
+      'marketing',
+      'sales',
+      'operations',
     ])
+    expect(DEPARTMENTS.map((d) => d.name)).not.toContain('Scout')
   })
 
-  it('assigns distinct accent colors to each agent', () => {
-    expect(AGENT_ACCENTS.scout).toBeTruthy()
-    expect(AGENT_ACCENTS.forge).toBeTruthy()
-    expect(AGENT_ACCENTS.nova).toBeTruthy()
-    expect(AGENT_ACCENTS.atlas).toBeTruthy()
-    expect(new Set(Object.values(AGENT_ACCENTS)).size).toBe(4)
+  it('maps board tags to the owning department', () => {
+    expect(departmentForTag('Engineering')).toBe('engineering')
+    expect(departmentForTag('Bug')).toBe('engineering')
+    expect(departmentForTag('Design')).toBe('design')
+    expect(departmentForTag('Growth')).toBe('marketing')
+    expect(departmentForTag('Discovery')).toBe('operations')
   })
 
-  it('creates a user message in a topic', () => {
-    const message = createChannelMessage({
-      topicSlug: 'general',
-      authorId: 'you',
-      body: 'Morning sync — anything blocked?',
-    })
-
-    expect(message.id).toMatch(/^msg-/)
-    expect(message.authorId).toBe('you')
-    expect(message.body).toBe('Morning sync — anything blocked?')
-    expect(message.topicSlug).toBe('general')
-    expect(message.kind).toBe('chat')
-    expect(message.createdAt).toBeTruthy()
+  it('gives each department a distinct accent', () => {
+    expect(new Set(Object.values(DEPARTMENT_ACCENTS)).size).toBe(5)
   })
 
-  it('formats message timestamps for the feed', () => {
+  it('formats message timestamps and status labels', () => {
     expect(formatMessageTime('2026-07-14T12:05:00.000Z')).toMatch(/\d{1,2}:\d{2}/)
+    expect(formatStatusLabel('review')).toMatch(/review/i)
   })
 
-  it('formats board status as a readable pill label', () => {
-    expect(formatStatusLabel('in_progress')).toBe('Agents Working')
-    expect(formatStatusLabel('review')).toBe('Needs Review')
-    expect(formatStatusLabel('done')).toBe('Shipped')
-    expect(formatStatusLabel('backlog')).toBe('Queued')
-  })
-
-  it('creates a board link payload for discussion', () => {
-    const link = createBoardLink({
-      todoId: 'seed-pricing',
-      title: 'Validate pricing hypothesis',
-      status: 'review',
-    })
-
-    expect(link.todoId).toBe('seed-pricing')
-    expect(link.title).toBe('Validate pricing hypothesis')
-    expect(link.status).toBe('review')
-    expect(boardDeepLink(link.todoId)).toBe('/tasks?focus=seed-pricing')
-  })
-
-  it('attaches a board link to a message that needs revision', () => {
-    const link = createBoardLink({
-      todoId: 'seed-empty',
-      title: 'Redesign empty states',
-      status: 'in_progress',
-    })
-    const message = createChannelMessage({
-      topicSlug: 'revisions',
+  it('creates task-scoped chat messages', () => {
+    const message = createTaskMessage({
+      todoId: 'seed-auth',
       authorId: 'you',
-      body: 'Nova — can we tighten the empty-state copy?',
-      boardLink: link,
+      body: 'Can we tighten the retry path?',
     })
 
-    expect(message.boardLink).toEqual(link)
+    expect(message.todoId).toBe('seed-auth')
+    expect(message.authorId).toBe('you')
     expect(message.kind).toBe('chat')
   })
 
-  it('derives live agent presence from board work', () => {
-    expect(deriveAgentPresence('nova', BOARD_TASKS)).toEqual({
-      status: 'working',
-      taskTitle: 'Redesign empty states',
+  it('replies in department voice and proposes the next board status', () => {
+    const reply = replyAsDepartment({
+      departmentId: 'engineering',
+      todoId: 'seed-checkout',
+      title: 'Fix checkout crash on retry',
     })
-    expect(deriveAgentPresence('forge', BOARD_TASKS)).toEqual({
-      status: 'working',
-      taskTitle: 'Fix checkout crash on retry',
-    })
-    expect(deriveAgentPresence('scout', BOARD_TASKS)).toEqual({
-      status: 'idle',
-    })
-    expect(deriveAgentPresence('atlas', BOARD_TASKS)).toEqual({
-      status: 'away',
-    })
+
+    expect(reply.authorId).toBe('engineering')
+    expect(reply.body.toLowerCase()).toMatch(/engineering|harden|review/)
+    expect(nextStatusAfterCommitment('in_progress')).toBe('review')
+    expect(nextStatusAfterCommitment('backlog')).toBe('in_progress')
+    expect(nextStatusAfterCommitment('review')).toBeNull()
   })
 
-  it('creates a virtual meeting announcement', () => {
-    const meeting = createMeeting({
-      title: 'Revision sync',
-      topicSlug: 'revisions',
-      participantIds: ['you', 'nova', 'forge'],
+  it('creates an inline status-change timeline event', () => {
+    const event = createStatusChangeMessage({
+      todoId: 'seed-checkout',
+      departmentId: 'engineering',
+      from: 'in_progress',
+      to: 'review',
     })
 
-    expect(meeting.id).toMatch(/^meet-/)
-    expect(meeting.title).toBe('Revision sync')
-    expect(meeting.status).toBe('live')
-    expect(meeting.participantIds).toEqual(['you', 'nova', 'forge'])
-  })
-
-  it('creates a custom topic for new discussions', () => {
-    const topic = createTopic({ name: 'Launch week', slug: 'launch-week' })
-
-    expect(topic.slug).toBe('launch-week')
-    expect(topic.name).toBe('Launch week')
-  })
-
-  it('generates an agent reply grounded in the discussion with a board card', () => {
-    const reply = replyAsAgent({
-      agentId: 'nova',
-      topicSlug: 'revisions',
-      aboutTitle: 'Redesign empty states',
-      boardLink: createBoardLink({
-        todoId: 'seed-empty',
-        title: 'Redesign empty states',
-        status: 'in_progress',
-      }),
-    })
-
-    expect(reply.authorId).toBe('nova')
-    expect(reply.topicSlug).toBe('revisions')
-    expect(reply.kind).toBe('chat')
-    expect(reply.body.toLowerCase()).toMatch(/empty states|revision|review/)
-    expect(reply.boardLink?.todoId).toBe('seed-empty')
+    expect(event.kind).toBe('status')
+    expect(event.body).toMatch(/engineering moved this task/i)
+    expect(event.statusChange).toEqual({ from: 'in_progress', to: 'review' })
   })
 })

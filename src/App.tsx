@@ -11,9 +11,9 @@ import { Navbar } from './components/Navbar'
 import { Footer } from './components/Footer'
 import { ScrollToTop } from './components/ScrollToTop'
 import { AboutPage } from './pages/AboutPage'
-import { ChannelPage } from './pages/ChannelPage'
 import { LandingPage } from './pages/LandingPage'
 import { DashboardPage, TeamPage } from './pages/SimplePage'
+import { StandupPage } from './pages/StandupPage'
 import { TasksPage } from './pages/TasksPage'
 import type { TagFilter } from './types/todo'
 import './components/Navbar.css'
@@ -34,8 +34,8 @@ function AppShell() {
   const [tagFilter, setTagFilter] = useState<TagFilter>('all')
   const location = useLocation()
   const isTasks = location.pathname === '/tasks'
-  const isChannel = location.pathname === '/channel'
-  const isFullBleed = isTasks || isChannel
+  const isStandup = location.pathname === '/standup'
+  const isFullBleed = isTasks
 
   return (
     <div className="app">
@@ -47,12 +47,12 @@ function AppShell() {
             <Link className="navbar__brand" to="/">
               To-Do
             </Link>
-            {!isChannel && (
-              <Link className="navbar__channel" to="/channel">
-                Channel
+            {!isStandup && (
+              <Link className="navbar__channel" to="/standup">
+                Standup
               </Link>
             )}
-            {isChannel && (
+            {isStandup && (
               <Link className="navbar__channel" to="/tasks">
                 Board
               </Link>
@@ -76,7 +76,7 @@ function App() {
         <Route index element={<LandingPage />} />
         <Route element={<AppShell />}>
           <Route path="tasks" element={<TasksRoute />} />
-          <Route path="channel" element={<ChannelPage />} />
+          <Route path="standup" element={<StandupPage />} />
           <Route path="team" element={<TeamPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="about" element={<AboutPage />} />

@@ -18,8 +18,8 @@ export function Navbar({ activeFilter, onFilterChange }: NavbarProps) {
         <Link className="navbar__brand" to="/">
           To-Do
         </Link>
-        <Link className="navbar__channel" to="/channel">
-          Channel
+        <Link className="navbar__channel" to="/standup">
+          Standup
         </Link>
       </div>
       <div className="navbar__filters" role="group" aria-label="Filter board by work type">

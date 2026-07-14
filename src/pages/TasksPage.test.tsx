@@ -46,13 +46,14 @@ describe('TasksPage Kanban', () => {
     expect(card).toHaveClass('tasks__sticky--queued')
   })
 
-  it('shows agent presence and live working agent count', () => {
+  it('shows department presence and live working department count', () => {
     renderTasks()
 
     const workingCard = screen
       .getByText(/redesign empty states/i)
       .closest('[data-todo-id]') as HTMLElement
-    expect(within(workingCard).getByText(/^nova$/i)).toBeInTheDocument()
+    expect(workingCard).toHaveAttribute('data-department', 'design')
+    expect(within(workingCard).getByTitle(/^design$/i)).toBeInTheDocument()
     expect(workingCard).toHaveClass('tasks__sticky--working')
 
     const reviewCard = screen
@@ -60,7 +61,7 @@ describe('TasksPage Kanban', () => {
       .closest('[data-todo-id]') as HTMLElement
     expect(within(reviewCard).getByText(/awaiting your approval/i)).toBeInTheDocument()
 
-    expect(screen.getByTestId('active-agent-count')).toHaveTextContent(/2 agents live/i)
+    expect(screen.getByTestId('active-agent-count')).toHaveTextContent(/2 departments live/i)
   })
 
   it('renders tags on work items', () => {
@@ -79,7 +80,7 @@ describe('TasksPage Kanban', () => {
       screen.getByRole('group', { name: /what type of work is this/i }),
     ).toBeInTheDocument()
     expect(
-      screen.getByText(/tag the brief so you can filter the board later/i),
+      screen.getByText(/tag the brief so the matching department owns it/i),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /tag as discovery/i })).toHaveAttribute(
       'aria-pressed',
@@ -91,7 +92,7 @@ describe('TasksPage Kanban', () => {
     expect(screen.getByText(/research & validation/i)).toBeInTheDocument()
   })
 
-  it('lets you assign or auto-assign an agent when briefing', async () => {
+  it('lets you assign or auto-assign a department when briefing', async () => {
     const user = userEvent.setup()
     renderTasks()
 
@@ -99,8 +100,8 @@ describe('TasksPage Kanban', () => {
       'aria-pressed',
       'true',
     )
-    await user.click(screen.getByRole('button', { name: /assign to forge/i }))
-    expect(screen.getByRole('button', { name: /assign to forge/i })).toHaveAttribute(
+    await user.click(screen.getByRole('button', { name: /assign to engineering/i }))
+    expect(screen.getByRole('button', { name: /assign to engineering/i })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
@@ -126,12 +127,12 @@ describe('TasksPage Kanban', () => {
     renderTasks()
 
     await user.type(
-      screen.getByLabelText(/what should an agent do/i),
+      screen.getByLabelText(/what should a department do/i),
       'Map checkout funnel',
     )
     await user.click(screen.getByRole('button', { name: /tag as growth/i }))
-    await user.click(screen.getByRole('button', { name: /assign to scout/i }))
-    await user.click(screen.getByRole('button', { name: /dispatch to agent/i }))
+    await user.click(screen.getByRole('button', { name: /assign to operations/i }))
+    await user.click(screen.getByRole('button', { name: /dispatch to department/i }))
 
     const queued = screen.getByRole('region', { name: /^queued$/i })
     const card = within(queued)
@@ -139,8 +140,20 @@ describe('TasksPage Kanban', () => {
       .closest('[data-todo-id]') as HTMLElement
     expect(card).toHaveClass('tasks__sticky')
     expect(within(card).getByText(/^growth$/i)).toBeInTheDocument()
-    expect(within(card).getByText(/^scout$/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/what should an agent do/i)).toHaveValue('')
+    expect(within(card).getByText(/^operations$/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/what should a department do/i)).toHaveValue('')
+  })
+
+  it('opens a task-anchored department channel from a discuss control', async () => {
+    const user = userEvent.setup()
+    renderTasks()
+
+    await user.click(screen.getByRole('button', { name: /discuss ship auth polish/i }))
+
+    expect(screen.getByTestId('task-channel-drawer')).toBeInTheDocument()
+    expect(screen.getByTestId('messaging-target')).toHaveTextContent(
+      /messaging:\s*engineering \(assigned to this task\)/i,
+    )
   })
 
   it('drags a sticky note from Queued into Agents Working with a move animation', () => {

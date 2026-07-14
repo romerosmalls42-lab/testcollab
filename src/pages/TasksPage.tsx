@@ -2,17 +2,18 @@ import { useEffect, useState, type DragEvent, type FormEvent } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useSearchParams } from 'react-router-dom'
 import {
-  AGENTS,
+  DEPARTMENTS,
   KANBAN_COLUMNS,
   TODO_TAGS,
-  agentFor,
-  getAgent,
-  type AgentId,
+  departmentForTag,
+  getDepartment,
+  type DepartmentId,
   type KanbanColumnId,
   type TagFilter,
   type Todo,
   type TodoTag,
 } from '../types/todo'
+import { TaskChannelDrawer } from './TaskChannelDrawer'
 import './TasksPage.css'
 
 const SEED_TODOS: Todo[] = [
@@ -21,35 +22,35 @@ const SEED_TODOS: Todo[] = [
     title: 'Validate pricing hypothesis',
     status: 'backlog',
     tags: ['Discovery'],
-    agentId: 'scout',
+    departmentId: 'operations',
   },
   {
     id: 'seed-empty',
     title: 'Redesign empty states',
     status: 'in_progress',
     tags: ['Design'],
-    agentId: 'nova',
+    departmentId: 'design',
   },
   {
     id: 'seed-auth',
     title: 'Ship auth polish',
     status: 'review',
     tags: ['Engineering'],
-    agentId: 'forge',
+    departmentId: 'engineering',
   },
   {
     id: 'seed-waitlist',
     title: 'Launch waitlist email',
     status: 'done',
     tags: ['Growth'],
-    agentId: 'atlas',
+    departmentId: 'marketing',
   },
   {
     id: 'seed-checkout',
     title: 'Fix checkout crash on retry',
     status: 'in_progress',
     tags: ['Bug', 'Engineering'],
-    agentId: 'forge',
+    departmentId: 'engineering',
   },
 ]
 
@@ -67,7 +68,7 @@ type TasksPageProps = {
   tagFilter?: TagFilter
 }
 
-type AgentChoice = AgentId | 'auto'
+type DepartmentChoice = DepartmentId | 'auto'
 
 function createId() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -100,11 +101,12 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
   const [todos, setTodos] = useState<Todo[]>(SEED_TODOS)
   const [draft, setDraft] = useState('')
   const [draftTag, setDraftTag] = useState<TodoTag>('Discovery')
-  const [draftAgent, setDraftAgent] = useState<AgentChoice>('auto')
+  const [draftDepartment, setDraftDepartment] = useState<DepartmentChoice>('auto')
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dropTarget, setDropTarget] = useState<KanbanColumnId | null>(null)
   const [arrivingId, setArrivingId] = useState<string | null>(null)
   const [partyTitle, setPartyTitle] = useState<string | null>(null)
+  const [discussTodoId, setDiscussTodoId] = useState<string | null>(null)
 
   const visibleTodos =
     tagFilter === 'all'
@@ -112,7 +114,8 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
       : todos.filter((todo) => todo.tags.includes(tagFilter))
 
   const workingTodos = visibleTodos.filter((todo) => todo.status === 'in_progress')
-  const activeAgentCount = new Set(workingTodos.map((todo) => todo.agentId)).size
+  const activeDepartmentCount = new Set(workingTodos.map((todo) => todo.departmentId)).size
+  const discussTodo = todos.find((todo) => todo.id === discussTodoId) ?? null
 
   useEffect(() => {
     if (!arrivingId) return
@@ -132,7 +135,8 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
     if (!title) return
 
     const id = createId()
-    const agentId = draftAgent === 'auto' ? agentFor(id).id : draftAgent
+    const departmentId =
+      draftDepartment === 'auto' ? departmentForTag(draftTag) : draftDepartment
 
     setTodos((current) => [
       {
@@ -140,7 +144,7 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
         title,
         status: 'backlog',
         tags: [draftTag],
-        agentId,
+        departmentId,
       },
       ...current,
     ])
@@ -200,47 +204,47 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
       <header className="tasks__header">
         <h1 className="tasks__title">Mission Control</h1>
         <p className="tasks__hint">
-          Agents claim and move work as they execute. You brief them, review output, and
-          approve what ships.
+          Departments claim and move work as they execute. Brief them, open a task channel
+          to discuss, review output, and approve what ships.
         </p>
       </header>
 
       <form className="tasks__composer" onSubmit={addTodo}>
-        <p className="tasks__composer-kicker">Brief an agent</p>
+        <p className="tasks__composer-kicker">Brief a department</p>
         <div className="tasks__composer-title-block">
           <label className="tasks__field-label" htmlFor="new-task">
-            What should an agent do?
+            What should a department do?
           </label>
           <input
             id="new-task"
             className="tasks__input"
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
-            placeholder="Describe the outcome you want an agent to deliver"
+            placeholder="Describe the outcome you want a department to deliver"
             autoComplete="off"
           />
         </div>
 
         <fieldset className="tasks__agent-assign">
-          <legend className="tasks__field-label">Assign to agent</legend>
-          <div className="tasks__agent-options" role="group" aria-label="Assign to agent">
+          <legend className="tasks__field-label">Assign to department</legend>
+          <div className="tasks__agent-options" role="group" aria-label="Assign to department">
             <button
               type="button"
               className={
-                draftAgent === 'auto'
+                draftDepartment === 'auto'
                   ? 'tasks__agent-option tasks__agent-option--selected'
                   : 'tasks__agent-option'
               }
-              aria-pressed={draftAgent === 'auto'}
-              onClick={() => setDraftAgent('auto')}
+              aria-pressed={draftDepartment === 'auto'}
+              onClick={() => setDraftDepartment('auto')}
             >
               Auto-assign
             </button>
-            {AGENTS.map((agent) => {
-              const selected = draftAgent === agent.id
+            {DEPARTMENTS.map((department) => {
+              const selected = draftDepartment === department.id
               return (
                 <button
-                  key={agent.id}
+                  key={department.id}
                   type="button"
                   className={
                     selected
@@ -248,13 +252,17 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
                       : 'tasks__agent-option'
                   }
                   aria-pressed={selected}
-                  aria-label={`Assign to ${agent.name}`}
-                  onClick={() => setDraftAgent(agent.id)}
+                  aria-label={`Assign to ${department.name}`}
+                  onClick={() => setDraftDepartment(department.id)}
                 >
-                  <span className="tasks__agent-option-avatar" aria-hidden="true">
-                    {agent.initial}
+                  <span
+                    className="tasks__agent-option-avatar"
+                    data-department={department.id}
+                    aria-hidden="true"
+                  >
+                    {department.initial}
                   </span>
-                  {agent.name}
+                  {department.name}
                 </button>
               )
             })}
@@ -264,7 +272,7 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
         <fieldset className="tasks__tagging" aria-describedby="tagging-help">
           <legend className="tasks__tagging-legend">What type of work is this?</legend>
           <p className="tasks__tagging-help" id="tagging-help">
-            Tag the brief so you can filter the board later. Agents still own execution.
+            Tag the brief so the matching department owns it and you can filter later.
           </p>
           <div className="tasks__tag-options">
             {TODO_TAGS.map((tag) => {
@@ -291,7 +299,7 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
         </fieldset>
 
         <button className="tasks__add" type="submit">
-          Dispatch to Agent
+          Dispatch to Department
         </button>
       </form>
 
@@ -310,16 +318,26 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
               arrivingId={arrivingId}
               focusId={focusId}
               isDropTarget={dropTarget === column.id}
-              activeAgentCount={column.id === 'in_progress' ? activeAgentCount : undefined}
+              activeDepartmentCount={
+                column.id === 'in_progress' ? activeDepartmentCount : undefined
+              }
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               onDelete={deleteTodo}
+              onDiscuss={setDiscussTodoId}
             />
           )
         })}
       </div>
+
+      <TaskChannelDrawer
+        todo={discussTodo}
+        open={Boolean(discussTodo)}
+        onClose={() => setDiscussTodoId(null)}
+        onStatusChange={(todoId, status) => moveTodo(todoId, status)}
+      />
 
       <AnimatePresence>
         {partyTitle && (
@@ -353,12 +371,13 @@ type KanbanColumnProps = {
   arrivingId: string | null
   focusId: string | null
   isDropTarget: boolean
-  activeAgentCount?: number
+  activeDepartmentCount?: number
   onDragStart: (event: DragEvent<HTMLLIElement>, id: string) => void
   onDragEnd: () => void
   onDragOver: (event: DragEvent<HTMLElement>, status: KanbanColumnId) => void
   onDrop: (event: DragEvent<HTMLElement>, status: KanbanColumnId) => void
   onDelete: (id: string) => void
+  onDiscuss: (id: string) => void
 }
 
 function KanbanColumn({
@@ -371,12 +390,13 @@ function KanbanColumn({
   arrivingId,
   focusId,
   isDropTarget,
-  activeAgentCount,
+  activeDepartmentCount,
   onDragStart,
   onDragEnd,
   onDragOver,
   onDrop,
   onDelete,
+  onDiscuss,
 }: KanbanColumnProps) {
   return (
     <section
@@ -392,9 +412,10 @@ function KanbanColumn({
       <div className="tasks__column-head">
         <div className="tasks__column-head-copy">
           <h2 className="tasks__column-title">{title}</h2>
-          {typeof activeAgentCount === 'number' && (
+          {typeof activeDepartmentCount === 'number' && (
             <p className="tasks__live-agents" data-testid="active-agent-count">
-              {activeAgentCount} agent{activeAgentCount === 1 ? '' : 's'} live
+              {activeDepartmentCount} department
+              {activeDepartmentCount === 1 ? '' : 's'} live
             </p>
           )}
         </div>
@@ -407,7 +428,7 @@ function KanbanColumn({
         ) : (
           <ul className="tasks__list">
             {todos.map((todo) => {
-              const agent = getAgent(todo.agentId)
+              const department = getDepartment(todo.departmentId)
               const focused = focusId === todo.id
               const classes = [
                 statusCardClass(todo.status),
@@ -423,7 +444,7 @@ function KanbanColumn({
                   key={todo.id}
                   className={classes}
                   data-todo-id={todo.id}
-                  data-agent={agent.id}
+                  data-department={department.id}
                   data-focused={focused ? 'true' : undefined}
                   draggable
                   onDragStart={(event) => onDragStart(event, todo.id)}
@@ -434,13 +455,14 @@ function KanbanColumn({
                   )}
                   <div className="tasks__card-top">
                     <span
-                      className={`tasks__agent-badge tasks__agent-badge--${agent.id}`}
-                      title={agent.name}
+                      className={`tasks__agent-badge tasks__agent-badge--${department.id}`}
+                      data-department={department.id}
+                      title={department.name}
                     >
                       <span className="tasks__agent-initial" aria-hidden="true">
-                        {agent.initial}
+                        {department.initial}
                       </span>
-                      <span className="tasks__agent-name">{agent.name}</span>
+                      <span className="tasks__agent-name">{department.name}</span>
                     </span>
                     {todo.status === 'in_progress' && (
                       <span className="tasks__progress" aria-hidden="true">
@@ -465,14 +487,24 @@ function KanbanColumn({
                       </li>
                     ))}
                   </ul>
-                  <button
-                    type="button"
-                    className="tasks__delete"
-                    aria-label={`Delete ${todo.title}`}
-                    onClick={() => onDelete(todo.id)}
-                  >
-                    Remove
-                  </button>
+                  <div className="tasks__card-actions">
+                    <button
+                      type="button"
+                      className="tasks__discuss"
+                      aria-label={`Discuss ${todo.title}`}
+                      onClick={() => onDiscuss(todo.id)}
+                    >
+                      Discuss
+                    </button>
+                    <button
+                      type="button"
+                      className="tasks__delete"
+                      aria-label={`Delete ${todo.title}`}
+                      onClick={() => onDelete(todo.id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </li>
               )
             })}
@@ -501,7 +533,7 @@ function DoneParty({ title, reduceMotion }: DonePartyProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <p className="tasks__party-message">Agent shipped: {title}</p>
+      <p className="tasks__party-message">Department shipped: {title}</p>
       {!reduceMotion &&
         pieces.map((piece) => (
           <span
