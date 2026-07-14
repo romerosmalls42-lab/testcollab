@@ -1,18 +1,30 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { Navbar } from './Navbar'
+
+function renderNavbar(
+  props: { activeFilter?: 'all' | 'active' | 'completed'; onFilterChange?: () => void } = {},
+) {
+  const { activeFilter = 'all', onFilterChange = () => {} } = props
+  return render(
+    <MemoryRouter>
+      <Navbar activeFilter={activeFilter} onFilterChange={onFilterChange} />
+    </MemoryRouter>,
+  )
+}
 
 describe('Navbar', () => {
   it('renders a navigation landmark with the app brand', () => {
-    render(<Navbar activeFilter="all" onFilterChange={() => {}} />)
+    renderNavbar()
 
     expect(screen.getByRole('navigation', { name: /main/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /to-?do/i })).toHaveTextContent(/to-?do/i)
   })
 
   it('renders All, Active, and Completed filter links', () => {
-    render(<Navbar activeFilter="all" onFilterChange={() => {}} />)
+    renderNavbar()
 
     expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^active$/i })).toBeInTheDocument()
@@ -20,7 +32,7 @@ describe('Navbar', () => {
   })
 
   it('marks the active filter as pressed', () => {
-    render(<Navbar activeFilter="active" onFilterChange={() => {}} />)
+    renderNavbar({ activeFilter: 'active' })
 
     expect(screen.getByRole('button', { name: /^active$/i })).toHaveAttribute(
       'aria-pressed',
@@ -40,7 +52,7 @@ describe('Navbar', () => {
     const user = userEvent.setup()
     const onFilterChange = vi.fn()
 
-    render(<Navbar activeFilter="all" onFilterChange={onFilterChange} />)
+    renderNavbar({ onFilterChange })
 
     await user.click(screen.getByRole('button', { name: /^completed$/i }))
 
