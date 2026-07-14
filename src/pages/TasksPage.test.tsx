@@ -105,7 +105,7 @@ describe('TasksPage Kanban', () => {
     expect(screen.getByLabelText(/work item title/i)).toHaveValue('')
   })
 
-  it('drags a sticky note from Backlog into Doing', () => {
+  it('drags a sticky note from Backlog into Doing with a move animation', () => {
     renderTasks()
 
     const card = screen.getByText(/validate pricing hypothesis/i).closest('[data-todo-id]')!
@@ -116,12 +116,30 @@ describe('TasksPage Kanban', () => {
     fireEvent.dragOver(doing, { dataTransfer })
     fireEvent.drop(doing, { dataTransfer })
 
-    expect(within(doing).getByText(/validate pricing hypothesis/i)).toBeInTheDocument()
+    const moved = within(doing)
+      .getByText(/validate pricing hypothesis/i)
+      .closest('[data-todo-id]') as HTMLElement
+    expect(moved).toHaveClass('tasks__sticky--arriving')
     expect(
       within(screen.getByRole('region', { name: /^backlog$/i })).queryByText(
         /validate pricing hypothesis/i,
       ),
     ).not.toBeInTheDocument()
+  })
+
+  it('celebrates when a sticky note moves into Done', () => {
+    renderTasks()
+
+    const card = screen.getByText(/ship auth polish/i).closest('[data-todo-id]')!
+    const done = screen.getByRole('region', { name: /^done$/i })
+    const dataTransfer = createDataTransfer()
+
+    fireEvent.dragStart(card, { dataTransfer })
+    fireEvent.dragOver(done, { dataTransfer })
+    fireEvent.drop(done, { dataTransfer })
+
+    expect(screen.getByTestId('done-party')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(/shipped/i)
   })
 
   it('filters the board by tag', () => {

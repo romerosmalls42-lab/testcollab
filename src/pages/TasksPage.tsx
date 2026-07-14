@@ -1,4 +1,5 @@
-import { useState, type DragEvent, type FormEvent } from 'react'
+import { useEffect, useState, type DragEvent, type FormEvent } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   KANBAN_COLUMNS,
   TODO_TAGS,
@@ -69,16 +70,31 @@ function tagClass(tag: TodoTag) {
 }
 
 export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
+  const reduceMotion = useReducedMotion()
   const [todos, setTodos] = useState<Todo[]>(SEED_TODOS)
   const [draft, setDraft] = useState('')
   const [draftTag, setDraftTag] = useState<TodoTag>('Discovery')
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dropTarget, setDropTarget] = useState<KanbanColumnId | null>(null)
+  const [arrivingId, setArrivingId] = useState<string | null>(null)
+  const [partyTitle, setPartyTitle] = useState<string | null>(null)
 
   const visibleTodos =
     tagFilter === 'all'
       ? todos
       : todos.filter((todo) => todo.tags.includes(tagFilter))
+
+  useEffect(() => {
+    if (!arrivingId) return
+    const timer = window.setTimeout(() => setArrivingId(null), 700)
+    return () => window.clearTimeout(timer)
+  }, [arrivingId])
+
+  useEffect(() => {
+    if (!partyTitle) return
+    const timer = window.setTimeout(() => setPartyTitle(null), 2200)
+    return () => window.clearTimeout(timer)
+  }, [partyTitle])
 
   function addTodo(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -98,9 +114,20 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
   }
 
   function moveTodo(id: string, status: KanbanColumnId) {
-    setTodos((current) =>
-      current.map((todo) => (todo.id === id ? { ...todo, status } : todo)),
+    const current = todos.find((todo) => todo.id === id)
+    if (!current || current.status === status) {
+      setArrivingId(id)
+      return
+    }
+
+    setTodos((items) =>
+      items.map((todo) => (todo.id === id ? { ...todo, status } : todo)),
     )
+    setArrivingId(id)
+
+    if (status === 'done') {
+      setPartyTitle(current.title)
+    }
   }
 
   function deleteTodo(id: string) {
@@ -205,6 +232,7 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
               todos={columnTodos}
               empty={emptyCopy(column.id)}
               draggingId={draggingId}
+              arrivingId={arrivingId}
               isDropTarget={dropTarget === column.id}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
@@ -215,6 +243,12 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
           )
         })}
       </div>
+
+      <AnimatePresence>
+        {partyTitle && (
+          <DoneParty key={partyTitle} title={partyTitle} reduceMotion={Boolean(reduceMotion)} />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -239,6 +273,7 @@ type KanbanColumnProps = {
   todos: Todo[]
   empty: string
   draggingId: string | null
+  arrivingId: string | null
   isDropTarget: boolean
   onDragStart: (event: DragEvent<HTMLLIElement>, id: string) => void
   onDragEnd: () => void
@@ -254,6 +289,7 @@ function KanbanColumn({
   todos,
   empty,
   draggingId,
+  arrivingId,
   isDropTarget,
   onDragStart,
   onDragEnd,
@@ -284,14 +320,19 @@ function KanbanColumn({
           <ul className="tasks__list">
             {todos.map((todo) => {
               const toneName = stickyToneFor(todo.id)
+              const classes = [
+                'tasks__sticky',
+                `tasks__sticky--${toneName}`,
+                draggingId === todo.id ? 'tasks__sticky--dragging' : '',
+                arrivingId === todo.id ? 'tasks__sticky--arriving' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')
+
               return (
                 <li
                   key={todo.id}
-                  className={
-                    draggingId === todo.id
-                      ? `tasks__sticky tasks__sticky--${toneName} tasks__sticky--dragging`
-                      : `tasks__sticky tasks__sticky--${toneName}`
-                  }
+                  className={classes}
                   data-todo-id={todo.id}
                   draggable
                   onDragStart={(event) => onDragStart(event, todo.id)}
@@ -320,5 +361,39 @@ function KanbanColumn({
         )}
       </div>
     </section>
+  )
+}
+
+type DonePartyProps = {
+  title: string
+  reduceMotion: boolean
+}
+
+function DoneParty({ title, reduceMotion }: DonePartyProps) {
+  const pieces = Array.from({ length: 18 }, (_, index) => index)
+
+  return (
+    <motion.div
+      className="tasks__party"
+      data-testid="done-party"
+      role="status"
+      aria-live="polite"
+      initial={reduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <p className="tasks__party-message">Shipped: {title}</p>
+      {!reduceMotion &&
+        pieces.map((piece) => (
+          <span
+            key={piece}
+            className={`tasks__party-piece tasks__party-piece--${piece % 3}`}
+            style={{
+              left: `${8 + ((piece * 5) % 84)}%`,
+              animationDelay: `${piece * 0.035}s`,
+            }}
+          />
+        ))}
+    </motion.div>
   )
 }
