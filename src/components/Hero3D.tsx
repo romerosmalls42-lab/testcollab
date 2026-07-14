@@ -1,9 +1,9 @@
 import { useRef } from 'react'
 import {
   motion,
-  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
+  useScroll,
   useSpring,
   useTransform,
 } from 'framer-motion'
@@ -12,11 +12,38 @@ type Hero3DProps = {
   reducedMotion?: boolean
 }
 
-const TASKS = [
-  { id: 'luna', label: 'Draft the brief for Luna', done: true },
-  { id: 'ship', label: 'Ship the landing polish', done: false },
-  { id: 'harper', label: 'Reply to Harper', done: false },
-  { id: 'review', label: 'Review tomorrow morning', done: false },
+const ORBIT_CARDS = [
+  {
+    id: 'today',
+    title: 'Today',
+    meta: '1 of 3',
+    tasks: [
+      { id: 'luna', label: 'Draft the brief for Luna', done: true },
+      { id: 'ship', label: 'Ship the landing polish', done: false },
+      { id: 'harper', label: 'Reply to Harper', done: false },
+    ],
+    primary: true,
+  },
+  {
+    id: 'focus',
+    title: 'Focus',
+    meta: '2',
+    tasks: [
+      { id: 'deep', label: 'Protect deep work', done: false },
+      { id: 'noise', label: 'Cut the noise', done: false },
+    ],
+    primary: false,
+  },
+  {
+    id: 'done',
+    title: 'Done',
+    meta: '4',
+    tasks: [
+      { id: 'archive', label: 'Archive notes', done: true },
+      { id: 'receipts', label: 'Sort receipts', done: true },
+    ],
+    primary: false,
+  },
 ] as const
 
 export function Hero3D({ reducedMotion }: Hero3DProps) {
@@ -24,16 +51,22 @@ export function Hero3D({ reducedMotion }: Hero3DProps) {
   const shouldReduce = reducedMotion ?? Boolean(prefersReduced)
   const stageRef = useRef<HTMLDivElement>(null)
 
+  const { scrollYProgress } = useScroll({
+    target: stageRef,
+    offset: ['start start', 'end start'],
+  })
+
+  const parallaxFarY = useTransform(scrollYProgress, [0, 1], [0, shouldReduce ? 0 : 140])
+  const parallaxMidY = useTransform(scrollYProgress, [0, 1], [0, shouldReduce ? 0 : 80])
+  const orbitScale = useTransform(scrollYProgress, [0, 1], [1, shouldReduce ? 1 : 0.82])
+  const orbitOpacity = useTransform(scrollYProgress, [0, 0.85], [1, shouldReduce ? 1 : 0.35])
+
   const rawX = useMotionValue(0)
   const rawY = useMotionValue(0)
   const springX = useSpring(rawX, { stiffness: 120, damping: 18, mass: 0.4 })
   const springY = useSpring(rawY, { stiffness: 120, damping: 18, mass: 0.4 })
-
-  const rotateX = useTransform(springY, [-0.5, 0.5], [8, -8])
-  const rotateY = useTransform(springX, [-0.5, 0.5], [-12, 12])
-  const glareX = useTransform(springX, [-0.5, 0.5], [20, 80])
-  const glareY = useTransform(springY, [-0.5, 0.5], [25, 75])
-  const glare = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,244,214,0.22), transparent 52%)`
+  const tiltX = useTransform(springY, [-0.5, 0.5], [10, -10])
+  const tiltY = useTransform(springX, [-0.5, 0.5], [-14, 14])
 
   function handlePointerMove(event: { clientX: number; clientY: number }) {
     if (shouldReduce || !stageRef.current) return
@@ -58,89 +91,114 @@ export function Hero3D({ reducedMotion }: Hero3DProps) {
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
     >
-      <div className="hero3d__atmosphere" />
+      <motion.div
+        className="hero3d__parallax hero3d__parallax--far"
+        data-testid="parallax-depth-far"
+        style={{ y: parallaxFarY }}
+      />
+      <motion.div
+        className="hero3d__parallax hero3d__parallax--mid"
+        data-testid="parallax-depth-mid"
+        style={{ y: parallaxMidY }}
+      />
+
       <motion.div
         className="hero3d__rig"
         style={
           shouldReduce
-            ? undefined
+            ? { scale: orbitScale, opacity: orbitOpacity }
             : {
-                rotateX,
-                rotateY,
+                rotateX: tiltX,
+                rotateY: tiltY,
+                scale: orbitScale,
+                opacity: orbitOpacity,
                 transformStyle: 'preserve-3d',
               }
         }
       >
         <motion.div
-          className="hero3d__slab hero3d__slab--far"
-          style={{ transform: 'translate3d(-8%, 10%, -110px) rotateY(18deg) rotateX(8deg)' }}
-          animate={shouldReduce ? undefined : { y: [0, -5, 0] }}
-          transition={{ duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="hero3d__orbit"
+          data-testid="todo-orbit-ring"
+          animate={shouldReduce ? undefined : { rotate: 360 }}
+          transition={
+            shouldReduce
+              ? undefined
+              : { duration: 28, repeat: Infinity, ease: 'linear' }
+          }
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          <div className="hero3d__card-chrome">
-            <span>Later</span>
-            <span>3</span>
-          </div>
-          <ul className="hero3d__task-list hero3d__task-list--muted">
-            <li className="hero3d__task">
-              <span className="hero3d__box" />
-              <span className="hero3d__label">Archive notes</span>
-            </li>
-            <li className="hero3d__task">
-              <span className="hero3d__box" />
-              <span className="hero3d__label">Sort receipts</span>
-            </li>
-          </ul>
-        </motion.div>
-
-        <motion.div
-          className="hero3d__slab hero3d__slab--mid"
-          style={{ transform: 'translate3d(6%, 4%, -48px) rotateY(10deg) rotateX(4deg)' }}
-          animate={shouldReduce ? undefined : { y: [0, -8, 0] }}
-          transition={{ duration: 6.2, repeat: Infinity, ease: 'easeInOut', delay: 0.35 }}
-        >
-          <div className="hero3d__card-chrome">
-            <span>Active</span>
-            <span>2</span>
-          </div>
-          <ul className="hero3d__task-list hero3d__task-list--muted">
-            <li className="hero3d__task">
-              <span className="hero3d__box" />
-              <span className="hero3d__label">Cut the noise</span>
-            </li>
-            <li className="hero3d__task">
-              <span className="hero3d__box" />
-              <span className="hero3d__label">Protect deep work</span>
-            </li>
-          </ul>
-        </motion.div>
-
-        <motion.div
-          className="hero3d__slab hero3d__slab--near"
-          style={{ transform: 'translate3d(0, 0, 40px) rotateY(-6deg)' }}
-          animate={shouldReduce ? undefined : { y: [0, -11, 0] }}
-          transition={{ duration: 5.4, repeat: Infinity, ease: 'easeInOut', delay: 0.7 }}
-        >
-          <div className="hero3d__card-chrome hero3d__card-chrome--primary">
-            <span>Today</span>
-            <span>1 of 4</span>
-          </div>
-          <ul className="hero3d__task-list">
-            {TASKS.map((task) => (
-              <li
-                key={task.id}
-                className={task.done ? 'hero3d__task hero3d__task--done' : 'hero3d__task'}
+          {ORBIT_CARDS.map((card, index) => {
+            const orbitAngle = index * 120
+            return (
+              <div
+                key={card.id}
+                className="hero3d__orbit-slot"
+                style={{
+                  transform: `rotate(${orbitAngle}deg) translateX(var(--orbit-radius)) rotate(-${orbitAngle}deg)`,
+                }}
               >
-                <span className={task.done ? 'hero3d__box hero3d__box--checked' : 'hero3d__box'} />
-                <span className="hero3d__label">{task.label}</span>
-              </li>
-            ))}
-          </ul>
+                <motion.div
+                  className={
+                    card.primary
+                      ? 'hero3d__slab hero3d__slab--primary'
+                      : 'hero3d__slab'
+                  }
+                  data-testid="todo-orbit-card"
+                  animate={
+                    shouldReduce
+                      ? undefined
+                      : {
+                          rotate: -360,
+                          y: [0, -8, 0],
+                        }
+                  }
+                  transition={
+                    shouldReduce
+                      ? undefined
+                      : {
+                          rotate: { duration: 28, repeat: Infinity, ease: 'linear' },
+                          y: {
+                            duration: 4.8 + index * 0.6,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                            delay: index * 0.25,
+                          },
+                        }
+                  }
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  <div
+                    className={
+                      card.primary
+                        ? 'hero3d__card-chrome hero3d__card-chrome--primary'
+                        : 'hero3d__card-chrome'
+                    }
+                  >
+                    <span>{card.title}</span>
+                    <span>{card.meta}</span>
+                  </div>
+                  <ul className="hero3d__task-list">
+                    {card.tasks.map((task) => (
+                      <li
+                        key={task.id}
+                        className={
+                          task.done ? 'hero3d__task hero3d__task--done' : 'hero3d__task'
+                        }
+                      >
+                        <span
+                          className={
+                            task.done ? 'hero3d__box hero3d__box--checked' : 'hero3d__box'
+                          }
+                        />
+                        <span className="hero3d__label">{task.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              </div>
+            )
+          })}
         </motion.div>
-
-        {!shouldReduce && (
-          <motion.div className="hero3d__glare" style={{ background: glare }} />
-        )}
       </motion.div>
     </div>
   )

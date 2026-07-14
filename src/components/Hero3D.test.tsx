@@ -23,17 +23,25 @@ describe('Hero3D', () => {
     vi.restoreAllMocks()
   })
 
-  it('shows a To-Do list card with a title and task rows', () => {
+  it('renders exactly three orbiting To-Do cards', () => {
+    render(<Hero3D reducedMotion />)
+
+    expect(screen.getAllByTestId('todo-orbit-card')).toHaveLength(3)
+  })
+
+  it('shows distinct To-Do card titles with task content', () => {
     render(<Hero3D reducedMotion />)
 
     const stage = screen.getByTestId('hero-3d-stage')
     expect(within(stage).getByText(/^today$/i)).toBeInTheDocument()
+    expect(within(stage).getByText(/^focus$/i)).toBeInTheDocument()
+    expect(within(stage).getByText(/^done$/i)).toBeInTheDocument()
     expect(within(stage).getByText(/draft the brief for luna/i)).toBeInTheDocument()
     expect(within(stage).getByText(/ship the landing polish/i)).toBeInTheDocument()
     expect(within(stage).getByText(/reply to harper/i)).toBeInTheDocument()
   })
 
-  it('marks at least one task complete and leaves others open', () => {
+  it('marks finished work complete on the Done card', () => {
     render(<Hero3D reducedMotion />)
 
     const stage = screen.getByTestId('hero-3d-stage')
@@ -43,5 +51,13 @@ describe('Hero3D', () => {
     expect(within(stage).getByText(/ship the landing polish/i).closest('li')).not.toHaveClass(
       'hero3d__task--done',
     )
+  })
+
+  it('exposes a parallax orbit ring for scroll-driven motion', () => {
+    render(<Hero3D reducedMotion />)
+
+    expect(screen.getByTestId('todo-orbit-ring')).toBeInTheDocument()
+    expect(screen.getByTestId('parallax-depth-far')).toBeInTheDocument()
+    expect(screen.getByTestId('parallax-depth-mid')).toBeInTheDocument()
   })
 })

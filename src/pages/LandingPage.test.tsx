@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { LandingPage } from './LandingPage'
 
@@ -39,17 +38,14 @@ describe('LandingPage', () => {
     expect(screen.getByRole('banner')).toHaveTextContent(/^to-?do$/i)
   })
 
-  it('shows a single primary headline and supporting line', () => {
+  it('leads with the manage-your-tasks message', () => {
     renderLanding()
 
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: /a quieter way to move work forward/i,
+        name: /let to-do manage your daily tasks so you don't have to/i,
       }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(/one list\. clear next actions\. nothing else competing/i),
     ).toBeInTheDocument()
   })
 
@@ -62,30 +58,12 @@ describe('LandingPage', () => {
     )
   })
 
-  it('includes progressive sections revealed below the hero', () => {
+  it('renders a parallax stage with three orbiting To-Do cards', () => {
     renderLanding()
 
-    expect(screen.getByRole('heading', { name: /^capture$/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /^focus$/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /^finish$/i })).toBeInTheDocument()
-  })
-
-  it('renders a cinematic 3D hero stage', () => {
-    renderLanding()
-
+    expect(screen.getByTestId('parallax-landing')).toBeInTheDocument()
     expect(screen.getByTestId('hero-3d-stage')).toBeInTheDocument()
     expect(screen.getByTestId('hero-3d-stage')).toHaveAttribute('aria-hidden', 'true')
-  })
-
-  it('offers a control to disclose the next landing beat', async () => {
-    const user = userEvent.setup()
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
-
-    renderLanding()
-
-    await user.click(screen.getByRole('button', { name: /continue/i }))
-
-    expect(scrollIntoView).toHaveBeenCalled()
+    expect(screen.getAllByTestId('todo-orbit-card')).toHaveLength(3)
   })
 })
