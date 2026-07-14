@@ -1,0 +1,219 @@
+.landing {
+  --ink: #0d1a15;
+  --paper: #eceae3;
+  --moss: #1b3d30;
+  --gold: #b8964a;
+  --mute: #5d6f66;
+
+  min-height: 100vh;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.landing__hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  color: #f3efe4;
+}
+
+.landing__hero-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(8, 16, 13, 0.88) 0%, rgba(8, 16, 13, 0.55) 42%, rgba(8, 16, 13, 0.18) 70%, transparent 100%),
+    linear-gradient(180deg, transparent 35%, rgba(8, 16, 13, 0.72) 100%);
+  pointer-events: none;
+}
+
+.landing__hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 38rem;
+  padding: clamp(2rem, 6vw, 4.5rem);
+  padding-bottom: clamp(2.5rem, 7vw, 5rem);
+}
+
+.landing__brand {
+  margin: 0 0 1.25rem;
+  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-size: clamp(2.75rem, 7vw, 4.75rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: #f7f2e6;
+}
+
+.landing__headline {
+  margin: 0 0 1rem;
+  max-width: 14ch;
+  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-size: clamp(1.85rem, 4.2vw, 3rem);
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.landing__support {
+  margin: 0 0 1.75rem;
+  max-width: 32ch;
+  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.55;
+  color: rgba(243, 239, 228, 0.82);
+}
+
+.landing__cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.25rem;
+}
+
+.landing__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1.35rem;
+  background: #f3efe4;
+  color: var(--ink);
+  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 160ms ease;
+}
+
+.landing__cta:hover,
+.landing__cta:focus-visible {
+  background: #ffffff;
+  outline: none;
+}
+
+.landing__cta:active {
+  transform: translateY(1px);
+}
+
+.landing__continue {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(243, 239, 228, 0.78);
+  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(243, 239, 228, 0.35);
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.landing__continue:hover,
+.landing__continue:focus-visible {
+  color: #f7f2e6;
+  border-color: var(--gold);
+  outline: none;
+}
+
+.landing__disclosure {
+  display: grid;
+  gap: 0;
+}
+
+.landing__beat {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  column-gap: 1.25rem;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vw, 6.5rem) clamp(1.5rem, 5vw, 3rem);
+  border-bottom: 1px solid rgba(13, 26, 21, 0.1);
+}
+
+.landing__beat-index {
+  grid-row: 1 / span 2;
+  margin: 0.2rem 0 0;
+  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+
+.landing__beat-title {
+  margin: 0 0 0.65rem;
+  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--moss);
+}
+
+.landing__beat-copy {
+  margin: 0;
+  max-width: 36ch;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--mute);
+}
+
+.landing__finale {
+  padding: clamp(4rem, 11vw, 7rem) clamp(1.5rem, 5vw, 3rem);
+  text-align: left;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.landing__finale-title {
+  margin: 0 0 0.75rem;
+  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-size: clamp(2rem, 4vw, 2.85rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.landing__finale-copy {
+  margin: 0 0 1.75rem;
+  max-width: 34ch;
+  color: var(--mute);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.landing__cta--finale {
+  background: var(--moss);
+  color: #f3efe4;
+}
+
+.landing__cta--finale:hover,
+.landing__cta--finale:focus-visible {
+  background: #143226;
+  color: #ffffff;
+}
+
+@media (max-width: 700px) {
+  .landing__beat {
+    grid-template-columns: 1fr;
+    row-gap: 0.35rem;
+  }
+
+  .landing__beat-index {
+    grid-row: auto;
+  }
+
+  .landing__hero-copy {
+    max-width: none;
+  }
+}

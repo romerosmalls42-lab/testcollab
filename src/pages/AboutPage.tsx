@@ -26,7 +26,7 @@ export function AboutPage() {
         ))}
       </ul>
 
-      <Link className="about__cta" to="/">
+      <Link className="about__cta" to="/tasks">
         Back to tasks
       </Link>
     </section>

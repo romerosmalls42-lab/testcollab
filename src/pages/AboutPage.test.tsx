@@ -38,6 +38,6 @@ describe('AboutPage', () => {
   it('provides a link back to the task list', () => {
     renderAbout()
 
-    expect(screen.getByRole('link', { name: /back to tasks/i })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: /back to tasks/i })).toHaveAttribute('href', '/tasks')
   })
 })
