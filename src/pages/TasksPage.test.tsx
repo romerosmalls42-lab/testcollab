@@ -67,7 +67,25 @@ describe('TasksPage Kanban', () => {
       'aria-pressed',
       'true',
     )
+    expect(screen.getByRole('button', { name: /tag as discovery/i })).toHaveClass(
+      'tasks__tag-option--selected',
+    )
     expect(screen.getByText(/research & validation/i)).toBeInTheDocument()
+  })
+
+  it('highlights the chosen tag in gold when selected', async () => {
+    const user = userEvent.setup()
+    renderTasks()
+
+    const growth = screen.getByRole('button', { name: /tag as growth/i })
+    await user.click(growth)
+
+    expect(growth).toHaveAttribute('aria-pressed', 'true')
+    expect(growth).toHaveClass('tasks__tag-option--selected')
+    expect(screen.getByRole('button', { name: /tag as discovery/i })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
   })
 
   it('adds a tagged sticky note to Backlog', async () => {
