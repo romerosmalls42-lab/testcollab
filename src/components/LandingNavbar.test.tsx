@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { LandingNavbar } from './LandingNavbar'
 
 describe('LandingNavbar', () => {
-  it('renders landing navigation with To-Do, Add Team Members, and Dashboard', () => {
+  it('renders landing navigation with To-Do, Add Agents, and Dashboard', () => {
     render(
       <MemoryRouter>
         <LandingNavbar />
@@ -16,7 +16,7 @@ describe('LandingNavbar', () => {
       'href',
       '/tasks',
     )
-    expect(within(nav).getByRole('link', { name: /^add team members$/i })).toHaveAttribute(
+    expect(within(nav).getByRole('link', { name: /^add agents$/i })).toHaveAttribute(
       'href',
       '/team',
     )

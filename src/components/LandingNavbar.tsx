@@ -12,7 +12,7 @@ export function LandingNavbar() {
           To-Do
         </Link>
         <Link className="landing-nav__link" to="/team">
-          Add Team Members
+          Add Agents
         </Link>
         <Link className="landing-nav__link" to="/dashboard">
           Dashboard

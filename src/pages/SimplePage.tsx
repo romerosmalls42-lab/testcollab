@@ -23,8 +23,8 @@ export function SimplePage({ title, lead }: SimplePageProps) {
 export function TeamPage() {
   return (
     <SimplePage
-      title="Add Team Members"
-      lead="Invite collaborators so your product team can plan, build, and ship in one place."
+      title="Add Agents"
+      lead="Deploy AI agents to your board so they can claim work, execute autonomously, and report back for review."
     />
   )
 }

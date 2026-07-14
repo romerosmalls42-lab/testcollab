@@ -35,15 +35,15 @@ describe('Landing routing', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: /let to-do manage your daily tasks so you don't have to/i,
+        name: /assign it\. your agents handle it\.?/i,
       }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: /start product planning/i }),
+      screen.getByRole('link', { name: /deploy your first agent/i }),
     ).toBeInTheDocument()
   })
 
-  it('takes Start Product Planning into the To-Do app', async () => {
+  it('takes Deploy Your First Agent into the To-Do app', async () => {
     const user = userEvent.setup()
 
     render(
@@ -52,7 +52,7 @@ describe('Landing routing', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('link', { name: /start product planning/i }))
+    await user.click(screen.getByRole('link', { name: /deploy your first agent/i }))
 
     expect(screen.getByRole('heading', { name: /kanban board/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument()
@@ -69,12 +69,12 @@ describe('Landing routing', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('link', { name: /start product planning/i }))
+    await user.click(screen.getByRole('link', { name: /deploy your first agent/i }))
 
     expect(scrollTo).toHaveBeenCalledWith(0, 0)
   })
 
-  it('opens Add Team Members and Dashboard from the landing navbar', async () => {
+  it('opens Add Agents and Dashboard from the landing navbar', async () => {
     const user = userEvent.setup()
 
     render(
@@ -83,10 +83,8 @@ describe('Landing routing', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('link', { name: /^add team members$/i }))
-    expect(
-      screen.getByRole('heading', { name: /^add team members$/i }),
-    ).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: /^add agents$/i }))
+    expect(screen.getByRole('heading', { name: /^add agents$/i })).toBeInTheDocument()
 
     await user.click(screen.getByRole('link', { name: /^to-do$/i }))
     await user.click(screen.getByRole('link', { name: /^dashboard$/i }))

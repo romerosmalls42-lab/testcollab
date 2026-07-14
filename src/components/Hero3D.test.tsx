@@ -39,20 +39,20 @@ describe('Hero3D', () => {
     expect(within(stage).getByText(/^done$/i)).toBeInTheDocument()
   })
 
-  it('shows a product-team benefit on each card', () => {
+  it('shows an agent-execution benefit on each card', () => {
     render(<Hero3D reducedMotion />)
 
     expect(screen.getByTestId('todo-benefit-backlog')).toHaveTextContent(
-      /capture every idea before it escapes/i,
+      /work queued for agents/i,
     )
     expect(screen.getByTestId('todo-benefit-doing')).toHaveTextContent(
-      /keep the whole team aligned on what.s in flight/i,
+      /agents actively executing/i,
     )
     expect(screen.getByTestId('todo-benefit-review')).toHaveTextContent(
-      /ship quality through shared review/i,
+      /agent output awaiting human approval/i,
     )
     expect(screen.getByTestId('todo-benefit-done')).toHaveTextContent(
-      /celebrate what shipped/i,
+      /shipped by your agents/i,
     )
   })
 
@@ -63,7 +63,7 @@ describe('Hero3D', () => {
     expect(stage).toHaveAttribute('data-active-card', 'doing')
     expect(screen.getByTestId('todo-featured-card')).toHaveAttribute('data-column', 'doing')
     expect(screen.getByTestId('todo-featured-card')).toHaveTextContent(
-      /keep the whole team aligned on what.s in flight/i,
+      /agents actively executing/i,
     )
   })
 

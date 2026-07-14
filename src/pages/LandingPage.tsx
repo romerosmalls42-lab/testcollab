@@ -122,7 +122,7 @@ export function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.85, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             >
-              Let To-Do Manage Your Daily Tasks So You Don&apos;t Have To
+              Assign It. Your Agents Handle It.
             </motion.h1>
             <motion.p
               className="landing__support"
@@ -130,7 +130,7 @@ export function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
             >
-              The one-stop shop for product teams building amazing products.
+              Work advances across the board as agents claim, execute, and return results—you assign and approve.
             </motion.p>
             <motion.div
               className="landing__cta-row"
@@ -139,7 +139,7 @@ export function LandingPage() {
               transition={{ duration: 0.75, delay: 0.36, ease: [0.22, 1, 0.36, 1] }}
             >
               <Link className="landing__cta" to="/tasks">
-                Start Product Planning
+                Deploy Your First Agent
               </Link>
             </motion.div>
             <motion.p className="landing__scroll-hint" style={{ opacity: hintOpacity }}>

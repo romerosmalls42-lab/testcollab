@@ -13,8 +13,8 @@ export const ORBIT_CARDS = [
   {
     id: 'backlog',
     title: 'Backlog',
-    meta: 'Ideas in',
-    benefit: 'Capture every idea before it escapes—then prioritize what ships next.',
+    meta: 'Awaiting pickup',
+    benefit: 'Work queued for agents—ideas wait here until an agent claims the brief.',
     tasks: [
       { id: 'roadmap', label: 'Shape Q3 roadmap themes', done: false },
       { id: 'research', label: 'Log customer research asks', done: false },
@@ -24,8 +24,8 @@ export const ORBIT_CARDS = [
   {
     id: 'doing',
     title: 'Doing',
-    meta: 'In flight',
-    benefit: "Keep the whole team aligned on what's in flight—no status meetings required.",
+    meta: 'Agent live',
+    benefit: 'Agents actively executing—work moves because they are completing it, not because you dragged it.',
     tasks: [
       { id: 'luna', label: 'Draft the brief for Luna', done: false },
       { id: 'ship', label: 'Ship the landing polish', done: false },
@@ -35,8 +35,8 @@ export const ORBIT_CARDS = [
   {
     id: 'review',
     title: 'Review',
-    meta: 'Quality gate',
-    benefit: 'Ship quality through shared review—catch issues before customers do.',
+    meta: 'Needs you',
+    benefit: 'Agent output awaiting human approval—you decide what ships, they did the lift.',
     tasks: [
       { id: 'qa', label: 'QA payment edge cases', done: false },
       { id: 'copy', label: 'Approve launch copy', done: false },
@@ -45,8 +45,8 @@ export const ORBIT_CARDS = [
   {
     id: 'done',
     title: 'Done',
-    meta: 'Shipped',
-    benefit: 'Celebrate what shipped—a clear record of product progress your team can trust.',
+    meta: 'Agent shipped',
+    benefit: 'Shipped by your agents—a clear ledger of autonomous work you can trust.',
     tasks: [
       { id: 'onboard', label: 'Ship onboarding v2', done: true },
       { id: 'notify', label: 'Launch notify prefs', done: true },

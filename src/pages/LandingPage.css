@@ -227,16 +227,21 @@
 .landing .landing-nav__brand {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.55rem;
-  letter-spacing: -0.02em;
+  font-size: 1.7rem;
+  letter-spacing: -0.025em;
   color: var(--gold-bright);
 }
 
 .landing .landing-nav__link {
   font-family: var(--font-body);
   position: relative;
-  color: rgba(243, 234, 210, 0.72);
+  color: var(--gold-deep);
   background: transparent;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-variant: small-caps;
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 .landing .landing-nav__link::after {

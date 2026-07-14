@@ -38,30 +38,30 @@ describe('LandingPage', () => {
     expect(screen.getByRole('banner')).toHaveTextContent(/^to-?do$/i)
   })
 
-  it('leads with the manage-your-tasks message', () => {
+  it('leads with an agentic assign-and-execute message', () => {
     renderLanding()
 
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: /let to-do manage your daily tasks so you don't have to/i,
+        name: /assign it\. your agents handle it\.?/i,
       }),
     ).toBeInTheDocument()
   })
 
-  it('markets To-Do as a one-stop shop for product teams', () => {
+  it('markets To-Do as agents moving work across the board', () => {
     renderLanding()
 
     expect(
-      screen.getByText(/one-stop shop for product teams building amazing products/i),
+      screen.getByText(/work advances across the board as agents claim, execute, and return results/i),
     ).toBeInTheDocument()
   })
 
-  it('has a clear CTA that starts product planning', () => {
+  it('has a clear CTA to deploy an agent', () => {
     renderLanding()
 
     expect(
-      screen.getByRole('link', { name: /start product planning/i }),
+      screen.getByRole('link', { name: /deploy your first agent/i }),
     ).toHaveAttribute('href', '/tasks')
   })
 
@@ -103,12 +103,12 @@ describe('LandingPage', () => {
     expect(arrow).toHaveTextContent(/scroll/i)
   })
 
-  it('shows a landing navbar with To-Do, Add Team Members, and Dashboard', () => {
+  it('shows a landing navbar with To-Do, Add Agents, and Dashboard', () => {
     renderLanding()
 
     const nav = screen.getByRole('navigation', { name: /landing/i })
     expect(nav).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /^add team members$/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^add agents$/i })).toHaveAttribute(
       'href',
       '/team',
     )
