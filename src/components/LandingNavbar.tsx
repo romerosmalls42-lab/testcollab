@@ -11,6 +11,9 @@ export function LandingNavbar() {
         <Link className="landing-nav__link" to="/tasks">
           To-Do
         </Link>
+        <Link className="landing-nav__link" to="/channel">
+          Channel
+        </Link>
         <Link className="landing-nav__link" to="/team">
           Add Agents
         </Link>

@@ -15,6 +15,12 @@
   border-bottom: 1px solid rgba(212, 175, 55, 0.28);
 }
 
+.navbar__brand-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+}
+
 .navbar__brand {
   font-family: 'Syne', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: clamp(1.5rem, 2.5vw, 1.85rem);
@@ -28,6 +34,27 @@
 .navbar__brand:hover,
 .navbar__brand:focus-visible {
   color: #fff8e8;
+  outline: none;
+}
+
+.navbar__channel {
+  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--nav-muted);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.navbar__channel:hover,
+.navbar__channel:focus-visible {
+  color: var(--nav-accent);
+  border-bottom-color: rgba(212, 175, 55, 0.55);
   outline: none;
 }
 

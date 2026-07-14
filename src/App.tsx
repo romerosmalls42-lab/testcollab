@@ -11,6 +11,7 @@ import { Navbar } from './components/Navbar'
 import { Footer } from './components/Footer'
 import { ScrollToTop } from './components/ScrollToTop'
 import { AboutPage } from './pages/AboutPage'
+import { ChannelPage } from './pages/ChannelPage'
 import { LandingPage } from './pages/LandingPage'
 import { DashboardPage, TeamPage } from './pages/SimplePage'
 import { TasksPage } from './pages/TasksPage'
@@ -33,6 +34,8 @@ function AppShell() {
   const [tagFilter, setTagFilter] = useState<TagFilter>('all')
   const location = useLocation()
   const isTasks = location.pathname === '/tasks'
+  const isChannel = location.pathname === '/channel'
+  const isFullBleed = isTasks || isChannel
 
   return (
     <div className="app">
@@ -40,15 +43,27 @@ function AppShell() {
         <Navbar activeFilter={tagFilter} onFilterChange={setTagFilter} />
       ) : (
         <nav className="navbar" aria-label="Main">
-          <Link className="navbar__brand" to="/">
-            To-Do
-          </Link>
+          <div className="navbar__brand-row">
+            <Link className="navbar__brand" to="/">
+              To-Do
+            </Link>
+            {!isChannel && (
+              <Link className="navbar__channel" to="/channel">
+                Channel
+              </Link>
+            )}
+            {isChannel && (
+              <Link className="navbar__channel" to="/tasks">
+                Board
+              </Link>
+            )}
+          </div>
         </nav>
       )}
-      <main className={isTasks ? 'app__main app__main--board' : 'app__main'}>
+      <main className={isFullBleed ? 'app__main app__main--board' : 'app__main'}>
         <Outlet context={{ tagFilter } satisfies AppShellContext} />
       </main>
-      {!isTasks && <Footer />}
+      {!isFullBleed && <Footer />}
     </div>
   )
 }
@@ -61,6 +76,7 @@ function App() {
         <Route index element={<LandingPage />} />
         <Route element={<AppShell />}>
           <Route path="tasks" element={<TasksRoute />} />
+          <Route path="channel" element={<ChannelPage />} />
           <Route path="team" element={<TeamPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="about" element={<AboutPage />} />

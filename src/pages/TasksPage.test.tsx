@@ -198,4 +198,16 @@ describe('TasksPage Kanban', () => {
 
     expect(screen.queryByText(/validate pricing hypothesis/i)).not.toBeInTheDocument()
   })
+
+  it('highlights a board item when opened from the channel deep link', () => {
+    render(
+      <MemoryRouter initialEntries={['/tasks?focus=seed-auth']}>
+        <TasksPage />
+      </MemoryRouter>,
+    )
+
+    const card = screen.getByText(/ship auth polish/i).closest('[data-todo-id]') as HTMLElement
+    expect(card).toHaveClass('tasks__sticky--focused')
+    expect(card).toHaveAttribute('data-focused', 'true')
+  })
 })

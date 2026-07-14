@@ -1,5 +1,6 @@
 import { useEffect, useState, type DragEvent, type FormEvent } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { useSearchParams } from 'react-router-dom'
 import {
   AGENTS,
   KANBAN_COLUMNS,
@@ -94,6 +95,8 @@ function statusCardClass(status: KanbanColumnId) {
 
 export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
   const reduceMotion = useReducedMotion()
+  const [searchParams] = useSearchParams()
+  const focusId = searchParams.get('focus')
   const [todos, setTodos] = useState<Todo[]>(SEED_TODOS)
   const [draft, setDraft] = useState('')
   const [draftTag, setDraftTag] = useState<TodoTag>('Discovery')
@@ -305,6 +308,7 @@ export function TasksPage({ tagFilter = 'all' }: TasksPageProps) {
               empty={emptyCopy(column.id)}
               draggingId={draggingId}
               arrivingId={arrivingId}
+              focusId={focusId}
               isDropTarget={dropTarget === column.id}
               activeAgentCount={column.id === 'in_progress' ? activeAgentCount : undefined}
               onDragStart={handleDragStart}
@@ -347,6 +351,7 @@ type KanbanColumnProps = {
   empty: string
   draggingId: string | null
   arrivingId: string | null
+  focusId: string | null
   isDropTarget: boolean
   activeAgentCount?: number
   onDragStart: (event: DragEvent<HTMLLIElement>, id: string) => void
@@ -364,6 +369,7 @@ function KanbanColumn({
   empty,
   draggingId,
   arrivingId,
+  focusId,
   isDropTarget,
   activeAgentCount,
   onDragStart,
@@ -402,10 +408,12 @@ function KanbanColumn({
           <ul className="tasks__list">
             {todos.map((todo) => {
               const agent = getAgent(todo.agentId)
+              const focused = focusId === todo.id
               const classes = [
                 statusCardClass(todo.status),
                 draggingId === todo.id ? 'tasks__sticky--dragging' : '',
                 arrivingId === todo.id ? 'tasks__sticky--arriving' : '',
+                focused ? 'tasks__sticky--focused' : '',
               ]
                 .filter(Boolean)
                 .join(' ')
@@ -416,6 +424,7 @@ function KanbanColumn({
                   className={classes}
                   data-todo-id={todo.id}
                   data-agent={agent.id}
+                  data-focused={focused ? 'true' : undefined}
                   draggable
                   onDragStart={(event) => onDragStart(event, todo.id)}
                   onDragEnd={onDragEnd}
