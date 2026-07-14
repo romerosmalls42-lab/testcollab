@@ -95,6 +95,14 @@ describe('LandingPage', () => {
     expect(screen.getByText(/scroll to explore the board/i)).toBeInTheDocument()
   })
 
+  it('shows a bouncing scroll arrow near the cards', () => {
+    renderLanding()
+
+    const arrow = screen.getByTestId('landing-scroll-arrow')
+    expect(arrow).toBeInTheDocument()
+    expect(arrow).toHaveTextContent(/scroll/i)
+  })
+
   it('shows a landing navbar with To-Do, Add Team Members, and Dashboard', () => {
     renderLanding()
 

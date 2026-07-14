@@ -51,6 +51,43 @@
   pointer-events: none;
 }
 
+.landing__scroll-arrow {
+  position: absolute;
+  z-index: 4;
+  right: clamp(1.25rem, 7vw, 4.5rem);
+  bottom: clamp(1.5rem, 6vh, 3.25rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  pointer-events: none;
+  color: #f0d78c;
+}
+
+.landing__scroll-arrow-label {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(240, 215, 140, 0.78);
+}
+
+.landing__scroll-arrow-icon {
+  display: grid;
+  place-items: center;
+  width: 2.65rem;
+  height: 2.65rem;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  background: rgba(5, 5, 5, 0.45);
+  color: #f0d78c;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.landing__scroll-arrow-icon svg {
+  display: block;
+}
+
 .landing__hero-copy {
   position: absolute;
   z-index: 2;
@@ -222,6 +259,13 @@
 
   .landing__headline {
     max-width: 18ch;
+  }
+
+  .landing__scroll-arrow {
+    right: auto;
+    left: 50%;
+    bottom: clamp(1rem, 4vh, 1.75rem);
+    transform: translateX(-50%);
   }
 
   .landing .footer {

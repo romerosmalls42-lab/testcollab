@@ -53,6 +53,7 @@ export function LandingPage() {
   )
   const introY = useTransform(smoothProgress, [0, 0.12], [0, reduceMotion ? 0 : -28])
   const hintOpacity = useTransform(smoothProgress, [0, 0.04, 0.1], [1, 1, 0])
+  const arrowOpacity = useTransform(smoothProgress, [0, 0.78, 0.9], [1, 0.85, 0])
 
   return (
     <div className="landing" data-testid="parallax-landing">
@@ -66,6 +67,34 @@ export function LandingPage() {
         <div className="landing__sticky">
           <Hero3D activeCard={activeCard} />
           <div className="landing__hero-veil" />
+          <motion.div
+            className="landing__scroll-arrow"
+            data-testid="landing-scroll-arrow"
+            style={{ opacity: arrowOpacity }}
+            aria-hidden="true"
+          >
+            <span className="landing__scroll-arrow-label">Scroll</span>
+            <motion.span
+              className="landing__scroll-arrow-icon"
+              animate={reduceMotion ? undefined : { y: [0, 12, 0] }}
+              transition={
+                reduceMotion
+                  ? undefined
+                  : { duration: 1.35, repeat: Infinity, ease: 'easeInOut' }
+              }
+            >
+              <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+                <path
+                  d="M6 9l6 6 6-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.span>
+          </motion.div>
           <motion.div
             className="landing__hero-copy"
             style={{ opacity: introOpacity, y: introY }}
