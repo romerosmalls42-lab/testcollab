@@ -9,15 +9,14 @@ export const TODO_TAGS = [
 export type TodoTag = (typeof TODO_TAGS)[number]
 
 export const KANBAN_COLUMNS = [
-  { id: 'backlog', title: 'Backlog' },
-  { id: 'in_progress', title: 'In Progress' },
-  { id: 'review', title: 'Review' },
-  { id: 'done', title: 'Done' },
+  { id: 'backlog', title: 'Backlog', tone: 'coral' },
+  { id: 'in_progress', title: 'Doing', tone: 'gold' },
+  { id: 'review', title: 'Review', tone: 'mint' },
+  { id: 'done', title: 'Done', tone: 'sky' },
 ] as const
 
 export type KanbanColumnId = (typeof KANBAN_COLUMNS)[number]['id']
 
-/** @deprecated Use KanbanColumnId — kept as alias during transition */
 export type TodoStatus = KanbanColumnId
 
 export type Todo = {
@@ -28,3 +27,15 @@ export type Todo = {
 }
 
 export type TagFilter = 'all' | TodoTag
+
+export const STICKY_TONES = ['lemon', 'peach', 'mint', 'sky', 'lilac'] as const
+
+export type StickyTone = (typeof STICKY_TONES)[number]
+
+export function stickyToneFor(id: string): StickyTone {
+  let hash = 0
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash + id.charCodeAt(i) * (i + 1)) % STICKY_TONES.length
+  }
+  return STICKY_TONES[hash]
+}
