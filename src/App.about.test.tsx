@@ -22,7 +22,7 @@ describe('About page routing', () => {
     ).toBeInTheDocument()
   })
 
-  it('returns home from the About page back-to-tasks link', async () => {
+  it('returns to tasks from the About page back-to-tasks link', async () => {
     const user = userEvent.setup()
 
     render(
