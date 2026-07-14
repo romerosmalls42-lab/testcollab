@@ -67,6 +67,15 @@ describe('Hero3D', () => {
     )
   })
 
+  it('marks the featured card with a pop-in appearance animation', () => {
+    render(<Hero3D activeCard={0} />)
+
+    expect(screen.getByTestId('todo-featured-card')).toHaveAttribute(
+      'data-animate',
+      'pop-in',
+    )
+  })
+
   it('exposes a parallax orbit ring for scroll-driven motion', () => {
     render(<Hero3D reducedMotion />)
 

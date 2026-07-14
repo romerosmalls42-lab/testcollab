@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
 import { Footer } from './components/Footer'
+import { ScrollToTop } from './components/ScrollToTop'
 import { AboutPage } from './pages/AboutPage'
 import { LandingPage } from './pages/LandingPage'
 import { TasksPage } from './pages/TasksPage'
@@ -52,13 +53,16 @@ function AppShell() {
 
 function App() {
   return (
-    <Routes>
-      <Route index element={<LandingPage />} />
-      <Route element={<AppShell />}>
-        <Route path="tasks" element={<TasksRoute />} />
-        <Route path="about" element={<AboutPage />} />
-      </Route>
-    </Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route index element={<LandingPage />} />
+        <Route element={<AppShell />}>
+          <Route path="tasks" element={<TasksRoute />} />
+          <Route path="about" element={<AboutPage />} />
+        </Route>
+      </Routes>
+    </>
   )
 }
 

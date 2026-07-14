@@ -80,4 +80,19 @@ describe('LandingPage', () => {
     expect(screen.getByTestId('landing-scroll-track')).toBeInTheDocument()
     expect(screen.getAllByTestId('landing-scroll-beat')).toHaveLength(4)
   })
+
+  it('uses a compact scroll track so card reveals arrive quickly', () => {
+    renderLanding()
+
+    expect(screen.getByTestId('landing-scroll-track')).toHaveAttribute(
+      'data-scroll-pace',
+      'snappy',
+    )
+  })
+
+  it('hints that scrolling reveals the board story', () => {
+    renderLanding()
+
+    expect(screen.getByText(/scroll to explore the board/i)).toBeInTheDocument()
+  })
 })
