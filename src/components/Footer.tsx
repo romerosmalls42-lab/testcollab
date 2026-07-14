@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom'
+
 const LINKS = [
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/about', label: 'About' },
+  { to: '/privacy', label: 'Privacy' },
+  { to: '/about', label: 'About' },
 ] as const
 
 export function Footer() {
@@ -12,10 +14,10 @@ export function Footer() {
         © {year} <span className="footer__brand">To-Do</span>
       </p>
       <nav className="footer__nav" aria-label="Footer">
-        {LINKS.map(({ href, label }) => (
-          <a key={href} className="footer__link" href={href}>
+        {LINKS.map(({ to, label }) => (
+          <Link key={to} className="footer__link" to={to}>
             {label}
-          </a>
+          </Link>
         ))}
       </nav>
     </footer>

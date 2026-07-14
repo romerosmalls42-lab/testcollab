@@ -1,0 +1,84 @@
+.about {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 3rem;
+}
+
+.about__title {
+  margin: 0 0 0.75rem;
+  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #0f2f24;
+}
+
+.about__lead {
+  margin: 0 0 2rem;
+  color: #4a6659;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.about__subtitle {
+  margin: 0 0 0.85rem;
+  font-family: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f2f24;
+}
+
+.about__features {
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.about__feature {
+  position: relative;
+  padding: 0.85rem 1rem 0.85rem 2.35rem;
+  background:
+    linear-gradient(135deg, rgba(244, 250, 247, 0.95), rgba(232, 241, 236, 0.9));
+  border-left: 3px solid #5ddea8;
+  color: #234235;
+  line-height: 1.45;
+}
+
+.about__feature::before {
+  content: '';
+  position: absolute;
+  left: 0.9rem;
+  top: 1.15rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: #0f2f24;
+}
+
+.about__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.15rem;
+  background: #0f2f24;
+  color: #f4f7f5;
+  font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.about__cta:hover,
+.about__cta:focus-visible {
+  background: #164536;
+  outline: none;
+}
+
+.about__cta:active {
+  transform: translateY(1px);
+}

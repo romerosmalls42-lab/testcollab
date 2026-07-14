@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export type TodoFilter = 'all' | 'active' | 'completed'
 
 export type NavbarProps = {
@@ -14,9 +16,9 @@ const FILTERS: { id: TodoFilter; label: string }[] = [
 export function Navbar({ activeFilter, onFilterChange }: NavbarProps) {
   return (
     <nav className="navbar" aria-label="Main">
-      <a className="navbar__brand" href="/">
+      <Link className="navbar__brand" to="/">
         To-Do
-      </a>
+      </Link>
       <div className="navbar__filters" role="group" aria-label="Filter tasks">
         {FILTERS.map(({ id, label }) => (
           <button
