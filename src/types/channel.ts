@@ -11,6 +11,18 @@ export type BoardLink = {
   todoId: string
   title: string
   status: KanbanColumnId
+  agentId?: AgentId
+}
+
+export type BoardTask = BoardLink & {
+  agentId: AgentId
+}
+
+export type AgentPresenceStatus = 'idle' | 'working' | 'away'
+
+export type AgentPresence = {
+  status: AgentPresenceStatus
+  taskTitle?: string
 }
 
 export type ChannelMessageKind = 'chat' | 'system' | 'meeting'
@@ -37,34 +49,55 @@ export type ChannelMeeting = {
   startedAt: string
 }
 
+/** Distinct accents inside the gold/black system — Slack-style teammate identity. */
+export const AGENT_ACCENTS: Record<AgentId, string> = {
+  scout: '#6ea8d9',
+  forge: '#e0a45a',
+  nova: '#d4a0c7',
+  atlas: '#7eb8a2',
+}
+
 export const CHANNEL_TOPICS: ChannelTopic[] = [
   { slug: 'general', name: 'General' },
   { slug: 'revisions', name: 'Revisions' },
   { slug: 'standup', name: 'Standup' },
 ]
 
-export const DISCUSSABLE_BOARD_ITEMS: BoardLink[] = [
+export const BOARD_TASKS: BoardTask[] = [
   {
     todoId: 'seed-pricing',
     title: 'Validate pricing hypothesis',
     status: 'backlog',
+    agentId: 'scout',
   },
   {
     todoId: 'seed-empty',
     title: 'Redesign empty states',
     status: 'in_progress',
+    agentId: 'nova',
   },
   {
     todoId: 'seed-auth',
     title: 'Ship auth polish',
     status: 'review',
+    agentId: 'forge',
+  },
+  {
+    todoId: 'seed-waitlist',
+    title: 'Launch waitlist email',
+    status: 'done',
+    agentId: 'atlas',
   },
   {
     todoId: 'seed-checkout',
     title: 'Fix checkout crash on retry',
     status: 'in_progress',
+    agentId: 'forge',
   },
 ]
+
+/** @deprecated Prefer BOARD_TASKS — kept for call sites that only need discussable items. */
+export const DISCUSSABLE_BOARD_ITEMS: BoardLink[] = BOARD_TASKS
 
 function createId(prefix: string) {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -82,6 +115,7 @@ export function createBoardLink(input: BoardLink): BoardLink {
     todoId: input.todoId,
     title: input.title,
     status: input.status,
+    agentId: input.agentId,
   }
 }
 
@@ -144,12 +178,14 @@ export function replyAsAgent(input: {
   agentId: AgentId
   topicSlug: string
   aboutTitle: string
+  boardLink?: BoardLink
 }): ChannelMessage {
   const template = AGENT_REPLY_TEMPLATES[input.agentId]
   return createChannelMessage({
     topicSlug: input.topicSlug,
     authorId: input.agentId,
     body: template(input.aboutTitle),
+    boardLink: input.boardLink,
   })
 }
 
@@ -161,4 +197,60 @@ export function authorLabel(authorId: ChannelAuthorId) {
 export function authorInitial(authorId: ChannelAuthorId) {
   if (authorId === 'you') return 'Y'
   return AGENTS.find((agent) => agent.id === authorId)?.initial ?? '?'
+}
+
+export function formatMessageTime(iso: string) {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return ''
+  return new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date)
+}
+
+export function formatStatusLabel(status: KanbanColumnId) {
+  switch (status) {
+    case 'backlog':
+      return 'Queued'
+    case 'in_progress':
+      return 'Agents Working'
+    case 'review':
+      return 'Needs Review'
+    case 'done':
+      return 'Shipped'
+  }
+}
+
+export function deriveAgentPresence(
+  agentId: AgentId,
+  board: BoardTask[] = BOARD_TASKS,
+): AgentPresence {
+  const owned = board.filter((task) => task.agentId === agentId)
+  const working = owned.find((task) => task.status === 'in_progress')
+  if (working) {
+    return { status: 'working', taskTitle: working.title }
+  }
+
+  const hasOnlyShipped =
+    owned.length > 0 && owned.every((task) => task.status === 'done')
+  if (hasOnlyShipped) {
+    return { status: 'away' }
+  }
+
+  return { status: 'idle' }
+}
+
+export function activeBoardTasks(board: BoardTask[] = BOARD_TASKS) {
+  return board.filter((task) => task.status === 'in_progress')
+}
+
+export function filterBoardTasks(query: string, board: BoardTask[] = BOARD_TASKS) {
+  const needle = query.trim().toLowerCase()
+  if (!needle) return board
+  return board.filter(
+    (task) =>
+      task.title.toLowerCase().includes(needle) ||
+      task.status.toLowerCase().includes(needle) ||
+      task.agentId.toLowerCase().includes(needle),
+  )
 }

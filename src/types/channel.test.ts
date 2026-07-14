@@ -1,11 +1,16 @@
 import { describe, it, expect } from 'vitest'
 import {
+  AGENT_ACCENTS,
+  BOARD_TASKS,
   CHANNEL_TOPICS,
   createBoardLink,
   createChannelMessage,
   createMeeting,
   createTopic,
   boardDeepLink,
+  deriveAgentPresence,
+  formatMessageTime,
+  formatStatusLabel,
   replyAsAgent,
 } from './channel'
 
@@ -16,6 +21,14 @@ describe('channel types and helpers', () => {
       'revisions',
       'standup',
     ])
+  })
+
+  it('assigns distinct accent colors to each agent', () => {
+    expect(AGENT_ACCENTS.scout).toBeTruthy()
+    expect(AGENT_ACCENTS.forge).toBeTruthy()
+    expect(AGENT_ACCENTS.nova).toBeTruthy()
+    expect(AGENT_ACCENTS.atlas).toBeTruthy()
+    expect(new Set(Object.values(AGENT_ACCENTS)).size).toBe(4)
   })
 
   it('creates a user message in a topic', () => {
@@ -31,6 +44,17 @@ describe('channel types and helpers', () => {
     expect(message.topicSlug).toBe('general')
     expect(message.kind).toBe('chat')
     expect(message.createdAt).toBeTruthy()
+  })
+
+  it('formats message timestamps for the feed', () => {
+    expect(formatMessageTime('2026-07-14T12:05:00.000Z')).toMatch(/\d{1,2}:\d{2}/)
+  })
+
+  it('formats board status as a readable pill label', () => {
+    expect(formatStatusLabel('in_progress')).toBe('Agents Working')
+    expect(formatStatusLabel('review')).toBe('Needs Review')
+    expect(formatStatusLabel('done')).toBe('Shipped')
+    expect(formatStatusLabel('backlog')).toBe('Queued')
   })
 
   it('creates a board link payload for discussion', () => {
@@ -63,6 +87,23 @@ describe('channel types and helpers', () => {
     expect(message.kind).toBe('chat')
   })
 
+  it('derives live agent presence from board work', () => {
+    expect(deriveAgentPresence('nova', BOARD_TASKS)).toEqual({
+      status: 'working',
+      taskTitle: 'Redesign empty states',
+    })
+    expect(deriveAgentPresence('forge', BOARD_TASKS)).toEqual({
+      status: 'working',
+      taskTitle: 'Fix checkout crash on retry',
+    })
+    expect(deriveAgentPresence('scout', BOARD_TASKS)).toEqual({
+      status: 'idle',
+    })
+    expect(deriveAgentPresence('atlas', BOARD_TASKS)).toEqual({
+      status: 'away',
+    })
+  })
+
   it('creates a virtual meeting announcement', () => {
     const meeting = createMeeting({
       title: 'Revision sync',
@@ -83,16 +124,22 @@ describe('channel types and helpers', () => {
     expect(topic.name).toBe('Launch week')
   })
 
-  it('generates an agent reply grounded in the discussion', () => {
+  it('generates an agent reply grounded in the discussion with a board card', () => {
     const reply = replyAsAgent({
       agentId: 'nova',
       topicSlug: 'revisions',
       aboutTitle: 'Redesign empty states',
+      boardLink: createBoardLink({
+        todoId: 'seed-empty',
+        title: 'Redesign empty states',
+        status: 'in_progress',
+      }),
     })
 
     expect(reply.authorId).toBe('nova')
     expect(reply.topicSlug).toBe('revisions')
     expect(reply.kind).toBe('chat')
     expect(reply.body.toLowerCase()).toMatch(/empty states|revision|review/)
+    expect(reply.boardLink?.todoId).toBe('seed-empty')
   })
 })
