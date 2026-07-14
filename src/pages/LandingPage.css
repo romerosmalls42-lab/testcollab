@@ -10,14 +10,30 @@
   background: var(--paper);
 }
 
-.landing__hero {
+.landing__scroll-track {
   position: relative;
+  height: 520vh;
+}
+
+.landing__sticky {
+  position: sticky;
+  top: 0;
   isolation: isolate;
-  min-height: 140svh;
-  display: grid;
-  align-items: end;
+  height: 100svh;
   overflow: clip;
   color: #f8f1df;
+}
+
+.landing__beats {
+  position: absolute;
+  inset: 100vh 0 0;
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  pointer-events: none;
+}
+
+.landing__beat-spacer {
+  min-height: 100vh;
 }
 
 .landing__hero-veil {
@@ -25,18 +41,17 @@
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(5, 5, 5, 0.94) 0%, rgba(5, 5, 5, 0.68) 38%, rgba(5, 5, 5, 0.18) 70%, transparent 100%),
-    linear-gradient(180deg, transparent 28%, rgba(5, 5, 5, 0.88) 100%);
+    linear-gradient(90deg, rgba(5, 5, 5, 0.88) 0%, rgba(5, 5, 5, 0.42) 36%, rgba(5, 5, 5, 0.12) 62%, transparent 100%),
+    linear-gradient(180deg, transparent 34%, rgba(5, 5, 5, 0.72) 100%);
   pointer-events: none;
 }
 
 .landing__hero-copy {
-  position: sticky;
-  top: 0;
+  position: absolute;
   z-index: 2;
-  align-self: start;
-  max-width: 40rem;
-  min-height: 100svh;
+  left: 0;
+  bottom: 0;
+  max-width: 38rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -73,7 +88,7 @@
 
 .landing__support {
   margin: 0 0 1.75rem;
-  max-width: 34ch;
+  max-width: 36ch;
   font-family: 'DM Sans', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: clamp(1rem, 1.5vw, 1.12rem);
   line-height: 1.55;
@@ -142,14 +157,16 @@
 }
 
 @media (max-width: 700px) {
-  .landing__hero {
-    min-height: 160svh;
+  .landing__scroll-track {
+    height: 560vh;
   }
 
   .landing__hero-copy {
     max-width: none;
+    top: 0;
+    bottom: auto;
     justify-content: flex-start;
-    padding-top: clamp(5.5rem, 18vw, 7rem);
+    padding-top: clamp(5rem, 16vw, 6.5rem);
   }
 
   .landing__headline {

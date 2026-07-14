@@ -49,6 +49,14 @@ describe('LandingPage', () => {
     ).toBeInTheDocument()
   })
 
+  it('markets To-Do as a one-stop shop for product teams', () => {
+    renderLanding()
+
+    expect(
+      screen.getByText(/one-stop shop for product teams building amazing products/i),
+    ).toBeInTheDocument()
+  })
+
   it('has a clear CTA that starts the To-Do app', () => {
     renderLanding()
 
@@ -58,12 +66,18 @@ describe('LandingPage', () => {
     )
   })
 
-  it('renders a parallax stage with three orbiting To-Do cards', () => {
+  it('renders a parallax stage with four orbiting board cards', () => {
     renderLanding()
 
     expect(screen.getByTestId('parallax-landing')).toBeInTheDocument()
     expect(screen.getByTestId('hero-3d-stage')).toBeInTheDocument()
-    expect(screen.getByTestId('hero-3d-stage')).toHaveAttribute('aria-hidden', 'true')
-    expect(screen.getAllByTestId('todo-orbit-card')).toHaveLength(3)
+    expect(screen.getAllByTestId('todo-orbit-card')).toHaveLength(4)
+  })
+
+  it('includes scroll beats so cards can pop out one by one', () => {
+    renderLanding()
+
+    expect(screen.getByTestId('landing-scroll-track')).toBeInTheDocument()
+    expect(screen.getAllByTestId('landing-scroll-beat')).toHaveLength(4)
   })
 })

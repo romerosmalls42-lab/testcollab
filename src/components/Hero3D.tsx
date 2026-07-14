@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import {
+  AnimatePresence,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -8,45 +9,60 @@ import {
   useTransform,
 } from 'framer-motion'
 
-type Hero3DProps = {
-  reducedMotion?: boolean
-}
-
-const ORBIT_CARDS = [
+export const ORBIT_CARDS = [
   {
-    id: 'today',
-    title: 'Today',
-    meta: '1 of 3',
+    id: 'backlog',
+    title: 'Backlog',
+    meta: 'Ideas in',
+    benefit: 'Capture every idea before it escapes—then prioritize what ships next.',
     tasks: [
-      { id: 'luna', label: 'Draft the brief for Luna', done: true },
+      { id: 'roadmap', label: 'Shape Q3 roadmap themes', done: false },
+      { id: 'research', label: 'Log customer research asks', done: false },
+      { id: 'spike', label: 'Spike auth options', done: false },
+    ],
+  },
+  {
+    id: 'doing',
+    title: 'Doing',
+    meta: 'In flight',
+    benefit: "Keep the whole team aligned on what's in flight—no status meetings required.",
+    tasks: [
+      { id: 'luna', label: 'Draft the brief for Luna', done: false },
       { id: 'ship', label: 'Ship the landing polish', done: false },
       { id: 'harper', label: 'Reply to Harper', done: false },
     ],
-    primary: true,
   },
   {
-    id: 'focus',
-    title: 'Focus',
-    meta: '2',
+    id: 'review',
+    title: 'Review',
+    meta: 'Quality gate',
+    benefit: 'Ship quality through shared review—catch issues before customers do.',
     tasks: [
-      { id: 'deep', label: 'Protect deep work', done: false },
-      { id: 'noise', label: 'Cut the noise', done: false },
+      { id: 'qa', label: 'QA payment edge cases', done: false },
+      { id: 'copy', label: 'Approve launch copy', done: false },
     ],
-    primary: false,
   },
   {
     id: 'done',
     title: 'Done',
-    meta: '4',
+    meta: 'Shipped',
+    benefit: 'Celebrate what shipped—a clear record of product progress your team can trust.',
     tasks: [
-      { id: 'archive', label: 'Archive notes', done: true },
-      { id: 'receipts', label: 'Sort receipts', done: true },
+      { id: 'onboard', label: 'Ship onboarding v2', done: true },
+      { id: 'notify', label: 'Launch notify prefs', done: true },
     ],
-    primary: false,
   },
 ] as const
 
-export function Hero3D({ reducedMotion }: Hero3DProps) {
+export type OrbitCardId = (typeof ORBIT_CARDS)[number]['id']
+
+type Hero3DProps = {
+  reducedMotion?: boolean
+  /** Which board card is popped out; -1 keeps all in orbit. */
+  activeCard?: number
+}
+
+export function Hero3D({ reducedMotion, activeCard = -1 }: Hero3DProps) {
   const prefersReduced = useReducedMotion()
   const shouldReduce = reducedMotion ?? Boolean(prefersReduced)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -56,17 +72,18 @@ export function Hero3D({ reducedMotion }: Hero3DProps) {
     offset: ['start start', 'end start'],
   })
 
-  const parallaxFarY = useTransform(scrollYProgress, [0, 1], [0, shouldReduce ? 0 : 140])
-  const parallaxMidY = useTransform(scrollYProgress, [0, 1], [0, shouldReduce ? 0 : 80])
-  const orbitScale = useTransform(scrollYProgress, [0, 1], [1, shouldReduce ? 1 : 0.82])
-  const orbitOpacity = useTransform(scrollYProgress, [0, 0.85], [1, shouldReduce ? 1 : 0.35])
+  const parallaxFarY = useTransform(scrollYProgress, [0, 1], [0, shouldReduce ? 0 : 120])
+  const parallaxMidY = useTransform(scrollYProgress, [0, 1], [0, shouldReduce ? 0 : 70])
 
   const rawX = useMotionValue(0)
   const rawY = useMotionValue(0)
   const springX = useSpring(rawX, { stiffness: 120, damping: 18, mass: 0.4 })
   const springY = useSpring(rawY, { stiffness: 120, damping: 18, mass: 0.4 })
-  const tiltX = useTransform(springY, [-0.5, 0.5], [10, -10])
-  const tiltY = useTransform(springX, [-0.5, 0.5], [-14, 14])
+  const tiltX = useTransform(springY, [-0.5, 0.5], [8, -8])
+  const tiltY = useTransform(springX, [-0.5, 0.5], [-12, 12])
+
+  const featured = activeCard >= 0 ? ORBIT_CARDS[activeCard] : null
+  const activeId = featured?.id ?? 'none'
 
   function handlePointerMove(event: { clientX: number; clientY: number }) {
     if (shouldReduce || !stageRef.current) return
@@ -84,9 +101,9 @@ export function Hero3D({ reducedMotion }: Hero3DProps) {
 
   return (
     <div
-      className="hero3d"
+      className={featured ? 'hero3d hero3d--featuring' : 'hero3d'}
       data-testid="hero-3d-stage"
-      aria-hidden="true"
+      data-active-card={activeId}
       ref={stageRef}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
@@ -95,23 +112,23 @@ export function Hero3D({ reducedMotion }: Hero3DProps) {
         className="hero3d__parallax hero3d__parallax--far"
         data-testid="parallax-depth-far"
         style={{ y: parallaxFarY }}
+        aria-hidden="true"
       />
       <motion.div
         className="hero3d__parallax hero3d__parallax--mid"
         data-testid="parallax-depth-mid"
         style={{ y: parallaxMidY }}
+        aria-hidden="true"
       />
 
       <motion.div
         className="hero3d__rig"
         style={
           shouldReduce
-            ? { scale: orbitScale, opacity: orbitOpacity }
+            ? undefined
             : {
                 rotateX: tiltX,
                 rotateY: tiltY,
-                scale: orbitScale,
-                opacity: orbitOpacity,
                 transformStyle: 'preserve-3d',
               }
         }
@@ -119,64 +136,75 @@ export function Hero3D({ reducedMotion }: Hero3DProps) {
         <motion.div
           className="hero3d__orbit"
           data-testid="todo-orbit-ring"
-          animate={shouldReduce ? undefined : { rotate: 360 }}
+          animate={
+            shouldReduce
+              ? undefined
+              : {
+                  rotate: 360,
+                  scale: featured ? 0.78 : 1,
+                }
+          }
           transition={
             shouldReduce
               ? undefined
-              : { duration: 28, repeat: Infinity, ease: 'linear' }
+              : {
+                  rotate: { duration: 32, repeat: Infinity, ease: 'linear' },
+                  scale: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+                }
           }
           style={{ transformStyle: 'preserve-3d' }}
         >
           {ORBIT_CARDS.map((card, index) => {
-            const orbitAngle = index * 120
+            const orbitAngle = index * 90
+            const isGhost = activeCard === index
             return (
               <div
                 key={card.id}
-                className="hero3d__orbit-slot"
+                className={
+                  isGhost
+                    ? 'hero3d__orbit-slot hero3d__orbit-slot--ghost'
+                    : 'hero3d__orbit-slot'
+                }
                 style={{
                   transform: `rotate(${orbitAngle}deg) translateX(var(--orbit-radius)) rotate(-${orbitAngle}deg)`,
                 }}
               >
                 <motion.div
-                  className={
-                    card.primary
-                      ? 'hero3d__slab hero3d__slab--primary'
-                      : 'hero3d__slab'
-                  }
+                  className="hero3d__slab"
                   data-testid="todo-orbit-card"
                   animate={
                     shouldReduce
                       ? undefined
                       : {
                           rotate: -360,
-                          y: [0, -8, 0],
+                          y: [0, -10, 0],
                         }
                   }
                   transition={
                     shouldReduce
                       ? undefined
                       : {
-                          rotate: { duration: 28, repeat: Infinity, ease: 'linear' },
+                          rotate: { duration: 32, repeat: Infinity, ease: 'linear' },
                           y: {
-                            duration: 4.8 + index * 0.6,
+                            duration: 5 + index * 0.45,
                             repeat: Infinity,
                             ease: 'easeInOut',
-                            delay: index * 0.25,
+                            delay: index * 0.2,
                           },
                         }
                   }
                   style={{ transformStyle: 'preserve-3d' }}
                 >
-                  <div
-                    className={
-                      card.primary
-                        ? 'hero3d__card-chrome hero3d__card-chrome--primary'
-                        : 'hero3d__card-chrome'
-                    }
-                  >
+                  <div className="hero3d__card-chrome">
                     <span>{card.title}</span>
                     <span>{card.meta}</span>
                   </div>
+                  <p
+                    className="hero3d__benefit hero3d__benefit--compact"
+                    data-testid={`todo-benefit-${card.id}`}
+                  >
+                    {card.benefit}
+                  </p>
                   <ul className="hero3d__task-list">
                     {card.tasks.map((task) => (
                       <li
@@ -200,6 +228,52 @@ export function Hero3D({ reducedMotion }: Hero3DProps) {
           })}
         </motion.div>
       </motion.div>
+
+      <div className="hero3d__featured-slot">
+        <AnimatePresence mode="wait">
+          {featured && (
+            <motion.article
+              key={featured.id}
+              className="hero3d__featured"
+              data-testid="todo-featured-card"
+              data-column={featured.id}
+              initial={
+                shouldReduce
+                  ? { opacity: 1, scale: 1 }
+                  : { opacity: 0, scale: 0.55, y: 80, rotateX: 18, rotateY: -12 }
+              }
+              animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0, rotateY: 0 }}
+              exit={
+                shouldReduce
+                  ? { opacity: 0 }
+                  : { opacity: 0, scale: 0.7, y: -40, rotateX: -8 }
+              }
+              transition={{ duration: shouldReduce ? 0.2 : 0.65, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="hero3d__card-chrome hero3d__card-chrome--primary">
+                <span>{featured.title}</span>
+                <span>{featured.meta}</span>
+              </div>
+              <p className="hero3d__benefit">{featured.benefit}</p>
+              <ul className="hero3d__task-list">
+                {featured.tasks.map((task) => (
+                  <li
+                    key={task.id}
+                    className={task.done ? 'hero3d__task hero3d__task--done' : 'hero3d__task'}
+                  >
+                    <span
+                      className={
+                        task.done ? 'hero3d__box hero3d__box--checked' : 'hero3d__box'
+                      }
+                    />
+                    <span className="hero3d__label">{task.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.article>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

@@ -23,33 +23,47 @@ describe('Hero3D', () => {
     vi.restoreAllMocks()
   })
 
-  it('renders exactly three orbiting To-Do cards', () => {
+  it('renders four kanban To-Do cards in orbit', () => {
     render(<Hero3D reducedMotion />)
 
-    expect(screen.getAllByTestId('todo-orbit-card')).toHaveLength(3)
+    expect(screen.getAllByTestId('todo-orbit-card')).toHaveLength(4)
   })
 
-  it('shows distinct To-Do card titles with task content', () => {
+  it('labels cards Backlog, Doing, Review, and Done', () => {
     render(<Hero3D reducedMotion />)
 
     const stage = screen.getByTestId('hero-3d-stage')
-    expect(within(stage).getByText(/^today$/i)).toBeInTheDocument()
-    expect(within(stage).getByText(/^focus$/i)).toBeInTheDocument()
+    expect(within(stage).getByText(/^backlog$/i)).toBeInTheDocument()
+    expect(within(stage).getByText(/^doing$/i)).toBeInTheDocument()
+    expect(within(stage).getByText(/^review$/i)).toBeInTheDocument()
     expect(within(stage).getByText(/^done$/i)).toBeInTheDocument()
-    expect(within(stage).getByText(/draft the brief for luna/i)).toBeInTheDocument()
-    expect(within(stage).getByText(/ship the landing polish/i)).toBeInTheDocument()
-    expect(within(stage).getByText(/reply to harper/i)).toBeInTheDocument()
   })
 
-  it('marks finished work complete on the Done card', () => {
+  it('shows a product-team benefit on each card', () => {
     render(<Hero3D reducedMotion />)
 
-    const stage = screen.getByTestId('hero-3d-stage')
-    expect(within(stage).getByText(/draft the brief for luna/i).closest('li')).toHaveClass(
-      'hero3d__task--done',
+    expect(screen.getByTestId('todo-benefit-backlog')).toHaveTextContent(
+      /capture every idea before it escapes/i,
     )
-    expect(within(stage).getByText(/ship the landing polish/i).closest('li')).not.toHaveClass(
-      'hero3d__task--done',
+    expect(screen.getByTestId('todo-benefit-doing')).toHaveTextContent(
+      /keep the whole team aligned on what.s in flight/i,
+    )
+    expect(screen.getByTestId('todo-benefit-review')).toHaveTextContent(
+      /ship quality through shared review/i,
+    )
+    expect(screen.getByTestId('todo-benefit-done')).toHaveTextContent(
+      /celebrate what shipped/i,
+    )
+  })
+
+  it('pops a card out of orbit when it becomes active', () => {
+    render(<Hero3D reducedMotion activeCard={1} />)
+
+    const stage = screen.getByTestId('hero-3d-stage')
+    expect(stage).toHaveAttribute('data-active-card', 'doing')
+    expect(screen.getByTestId('todo-featured-card')).toHaveAttribute('data-column', 'doing')
+    expect(screen.getByTestId('todo-featured-card')).toHaveTextContent(
+      /keep the whole team aligned on what.s in flight/i,
     )
   })
 
