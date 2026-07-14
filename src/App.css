@@ -5,7 +5,26 @@
 }
 
 .app--tasks {
-  background: #0f6d73;
+  background: #070707;
+}
+
+.app--tasks .navbar {
+  --nav-bg: #050505;
+  --nav-fg: #f8f1df;
+  --nav-muted: #b7a77a;
+  --nav-accent: #d4af37;
+  --nav-accent-soft: rgba(212, 175, 55, 0.16);
+  background: linear-gradient(180deg, #121212 0%, #050505 100%);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.28);
+}
+
+.app--tasks .navbar__brand {
+  color: #f0d78c;
+}
+
+.app--tasks .navbar__filter--active {
+  color: #111111;
+  background: linear-gradient(180deg, #f0d78c 0%, #d4af37 100%);
 }
 
 .app__main {
