@@ -8,6 +8,8 @@ To-Do web app. Navbar built with TDD (Vitest + Testing Library).
 - `npm test` — run unit tests
 - `npm run build` — production build
 
-## Navbar
+AWWAYS PULL DOWN THE LATEST CHANGES TO SEE LATEST CODE:
+git checkout main
+git pull origin main
 
 The `Navbar` component shows the **To-Do** brand and filter controls (**All**, **Active**, **Completed**) with accessible `aria-pressed` state.
