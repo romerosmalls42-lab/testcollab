@@ -1,15 +1,28 @@
 import { useState } from 'react'
-import { Link, Outlet, Route, Routes, useLocation } from 'react-router-dom'
+import {
+  Link,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useOutletContext,
+} from 'react-router-dom'
 import { Navbar, type TodoFilter } from './components/Navbar'
 import { Footer } from './components/Footer'
 import { AboutPage } from './pages/AboutPage'
 import { LandingPage } from './pages/LandingPage'
+import { TasksPage } from './pages/TasksPage'
 import './components/Navbar.css'
 import './components/Footer.css'
 import './App.css'
 
-function TasksPage() {
-  return <p className="app__success">It worked!</p>
+type AppShellContext = {
+  filter: TodoFilter
+}
+
+function TasksRoute() {
+  const { filter } = useOutletContext<AppShellContext>()
+  return <TasksPage filter={filter} />
 }
 
 function AppShell() {
@@ -18,7 +31,7 @@ function AppShell() {
   const showFilters = location.pathname === '/tasks'
 
   return (
-    <div className="app">
+    <div className={showFilters ? 'app app--tasks' : 'app'}>
       {showFilters ? (
         <Navbar activeFilter={filter} onFilterChange={setFilter} />
       ) : (
@@ -29,7 +42,7 @@ function AppShell() {
         </nav>
       )}
       <main className="app__main">
-        <Outlet />
+        <Outlet context={{ filter } satisfies AppShellContext} />
       </main>
       <Footer />
     </div>
@@ -41,7 +54,7 @@ function App() {
     <Routes>
       <Route index element={<LandingPage />} />
       <Route element={<AppShell />}>
-        <Route path="tasks" element={<TasksPage />} />
+        <Route path="tasks" element={<TasksRoute />} />
         <Route path="about" element={<AboutPage />} />
       </Route>
     </Routes>
