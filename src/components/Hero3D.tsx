@@ -84,6 +84,7 @@ export function Hero3D({ reducedMotion, activeCard = -1 }: Hero3DProps) {
 
   const featured = activeCard >= 0 ? ORBIT_CARDS[activeCard] : null
   const activeId = featured?.id ?? 'none'
+  const tellingStory = activeCard >= 0
 
   function handlePointerMove(event: { clientX: number; clientY: number }) {
     if (shouldReduce || !stageRef.current) return
@@ -104,6 +105,7 @@ export function Hero3D({ reducedMotion, activeCard = -1 }: Hero3DProps) {
       className={featured ? 'hero3d hero3d--featuring' : 'hero3d'}
       data-testid="hero-3d-stage"
       data-active-card={activeId}
+      data-story={tellingStory ? 'chapter' : 'intro'}
       ref={stageRef}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
@@ -139,57 +141,85 @@ export function Hero3D({ reducedMotion, activeCard = -1 }: Hero3DProps) {
           animate={
             shouldReduce
               ? undefined
-              : {
-                  rotate: 360,
-                  scale: featured ? 0.78 : 1,
-                }
+              : tellingStory
+                ? { rotate: 0, scale: 0.82 }
+                : { rotate: 360, scale: 1 }
           }
           transition={
             shouldReduce
               ? undefined
-              : {
-                  rotate: { duration: 32, repeat: Infinity, ease: 'linear' },
-                  scale: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-                }
+              : tellingStory
+                ? { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+                : {
+                    rotate: { duration: 48, repeat: Infinity, ease: 'linear' },
+                    scale: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+                  }
           }
           style={{ transformStyle: 'preserve-3d' }}
         >
           {ORBIT_CARDS.map((card, index) => {
             const orbitAngle = index * 90
             const isGhost = activeCard === index
+            const chapterPassed = activeCard > index
             return (
-              <div
+              <motion.div
                 key={card.id}
                 className={
                   isGhost
                     ? 'hero3d__orbit-slot hero3d__orbit-slot--ghost'
-                    : 'hero3d__orbit-slot'
+                    : chapterPassed
+                      ? 'hero3d__orbit-slot hero3d__orbit-slot--told'
+                      : 'hero3d__orbit-slot'
                 }
                 style={{
                   transform: `rotate(${orbitAngle}deg) translateX(var(--orbit-radius)) rotate(-${orbitAngle}deg)`,
+                }}
+                initial={
+                  shouldReduce
+                    ? false
+                    : { opacity: 0, scale: 0.55, filter: 'blur(6px)' }
+                }
+                animate={{
+                  opacity: isGhost ? 0.2 : chapterPassed ? 0.45 : 1,
+                  scale: 1,
+                  filter: 'blur(0px)',
+                }}
+                transition={{
+                  delay: shouldReduce ? 0 : 0.35 + index * 0.22,
+                  duration: 0.75,
+                  ease: [0.22, 1, 0.36, 1],
                 }}
               >
                 <motion.div
                   className="hero3d__slab"
                   data-testid="todo-orbit-card"
-                  animate={
+                  data-chapter={card.id}
+                  whileHover={
                     shouldReduce
+                      ? undefined
+                      : {
+                          boxShadow:
+                            '0 30px 60px rgba(0,0,0,0.45), 0 0 28px rgba(240,215,140,0.28), inset 0 1px 0 rgba(255,255,255,0.55)',
+                        }
+                  }
+                  animate={
+                    shouldReduce || tellingStory
                       ? undefined
                       : {
                           rotate: -360,
-                          y: [0, -10, 0],
+                          y: [0, -8, 0],
                         }
                   }
                   transition={
-                    shouldReduce
+                    shouldReduce || tellingStory
                       ? undefined
                       : {
-                          rotate: { duration: 32, repeat: Infinity, ease: 'linear' },
+                          rotate: { duration: 48, repeat: Infinity, ease: 'linear' },
                           y: {
-                            duration: 5 + index * 0.45,
+                            duration: 5.2 + index * 0.35,
                             repeat: Infinity,
                             ease: 'easeInOut',
-                            delay: index * 0.2,
+                            delay: index * 0.18,
                           },
                         }
                   }
@@ -223,7 +253,7 @@ export function Hero3D({ reducedMotion, activeCard = -1 }: Hero3DProps) {
                     ))}
                   </ul>
                 </motion.div>
-              </div>
+              </motion.div>
             )
           })}
         </motion.div>

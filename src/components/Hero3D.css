@@ -1,9 +1,11 @@
 .hero3d {
-  --slab-ink: #111111;
-  --slab-paper: #f7f1e2;
+  --slab-ink: #14110c;
+  --slab-paper: #f4ecda;
   --slab-gold: #d4af37;
+  --gold-bright: #f0d78c;
+  --gold-deep: #a8842a;
   --slab-mute: #6b6254;
-  --orbit-radius: clamp(11rem, 28vw, 18rem);
+  --orbit-radius: clamp(10rem, 26vw, 16.5rem);
 
   position: absolute;
   inset: 0;
@@ -20,37 +22,37 @@
 
 .hero3d__parallax--far {
   background:
-    radial-gradient(ellipse 55% 45% at 72% 38%, rgba(212, 175, 55, 0.22), transparent 62%),
-    radial-gradient(ellipse 40% 35% at 18% 78%, rgba(240, 215, 140, 0.08), transparent 70%),
-    linear-gradient(155deg, #050505 0%, #121212 48%, #070707 100%);
+    radial-gradient(ellipse 55% 45% at 68% 36%, rgba(168, 132, 42, 0.2), transparent 62%),
+    radial-gradient(ellipse 40% 35% at 18% 78%, rgba(240, 215, 140, 0.07), transparent 70%),
+    linear-gradient(155deg, #0a0a0a 0%, #050505 48%, #000000 100%);
 }
 
 .hero3d__parallax--mid {
   background:
-    radial-gradient(circle at 62% 48%, rgba(212, 175, 55, 0.12), transparent 42%),
-    radial-gradient(circle at 30% 30%, rgba(255, 248, 232, 0.04), transparent 35%);
+    radial-gradient(circle at 58% 44%, rgba(240, 215, 140, 0.1), transparent 42%),
+    radial-gradient(circle at 30% 30%, rgba(255, 248, 232, 0.035), transparent 35%);
   mix-blend-mode: screen;
   opacity: 0.9;
 }
 
 .hero3d__rig {
   position: absolute;
-  inset: 6% 4% 8% 4%;
+  inset: 4% 2% 10% 28%;
   display: grid;
   place-items: center;
   transform-style: preserve-3d;
-  transform: rotateX(14deg) rotateY(-10deg);
+  transform: rotateX(12deg) rotateY(-8deg);
   transition: inset 420ms ease, transform 420ms ease;
 }
 
 .hero3d--featuring .hero3d__rig {
-  inset: 8% 42% 10% 2%;
-  transform: rotateX(10deg) rotateY(-18deg) scale(0.92);
+  inset: 10% 46% 12% 2%;
+  transform: rotateX(10deg) rotateY(-16deg) scale(0.9);
 }
 
 .hero3d__orbit {
   position: relative;
-  width: min(88%, 34rem);
+  width: min(92%, 36rem);
   aspect-ratio: 1;
   transform-style: preserve-3d;
 }
@@ -59,9 +61,9 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: clamp(14rem, 28vw, 18.5rem);
-  margin-top: -9.5rem;
-  margin-left: -9rem;
+  width: clamp(13.5rem, 26vw, 17.5rem);
+  margin-top: -9rem;
+  margin-left: -8.5rem;
   transform-style: preserve-3d;
   transition: opacity 320ms ease, filter 320ms ease;
 }
@@ -71,21 +73,63 @@
   filter: blur(1px) saturate(0.7);
 }
 
+.hero3d__orbit-slot--told {
+  filter: saturate(0.85) brightness(0.92);
+}
+
 .hero3d__slab {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
-  min-height: 15.5rem;
+  min-height: 15rem;
   padding: 1.2rem 1.3rem 1.35rem;
-  border-radius: 0.35rem;
+  border-radius: 0.3rem;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 38%),
-    var(--slab-paper);
-  border: 1px solid rgba(199, 184, 154, 0.55);
+    linear-gradient(160deg, rgba(255, 255, 255, 0.42), transparent 42%),
+    linear-gradient(145deg, #f7f0e0, #efe4cf 72%);
+  border: 1px solid transparent;
+  background-clip: padding-box;
   box-shadow:
-    0 28px 56px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(212, 175, 55, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -1px 0 rgba(168, 132, 42, 0.18),
+    0 26px 52px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(168, 132, 42, 0.35);
   transform-style: preserve-3d;
+  transition: box-shadow 240ms ease;
+}
+
+.hero3d__slab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(246, 231, 168, 0.95) 0%,
+    rgba(168, 132, 42, 0.55) 38%,
+    rgba(240, 215, 140, 0.85) 68%,
+    rgba(168, 132, 42, 0.4) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.hero3d__slab:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(168, 132, 42, 0.22),
+    0 30px 60px rgba(0, 0, 0, 0.52),
+    0 0 28px rgba(240, 215, 140, 0.28),
+    0 0 0 1px rgba(240, 215, 140, 0.45);
 }
 
 .hero3d__featured-slot {
@@ -101,22 +145,50 @@
 }
 
 .hero3d__featured {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   min-height: clamp(18rem, 52vh, 26rem);
   padding: 1.6rem 1.75rem 1.8rem;
-  border-radius: 0.4rem;
+  border-radius: 0.35rem;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent 40%),
-    linear-gradient(145deg, #f8f5ed, #efe8d8 72%);
-  border: 1px solid rgba(212, 175, 55, 0.45);
+    linear-gradient(160deg, rgba(255, 255, 255, 0.48), transparent 42%),
+    linear-gradient(145deg, #f8f3e6, #efe6d2 72%);
+  border: 1px solid transparent;
   box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(168, 132, 42, 0.2),
     0 40px 80px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(240, 215, 140, 0.2);
+    0 0 36px rgba(240, 215, 140, 0.18),
+    0 0 0 1px rgba(168, 132, 42, 0.4);
   color: var(--slab-ink);
   transform-origin: center center;
   pointer-events: auto;
+}
+
+.hero3d__featured::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.25px;
+  background: linear-gradient(
+    135deg,
+    rgba(246, 231, 168, 1) 0%,
+    rgba(168, 132, 42, 0.65) 40%,
+    rgba(240, 215, 140, 0.95) 70%,
+    rgba(168, 132, 42, 0.5) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .hero3d__card-chrome {
@@ -125,13 +197,13 @@
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 0.7rem;
-  border-bottom: 1px solid rgba(22, 53, 42, 0.12);
-  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  border-bottom: 1px solid rgba(168, 132, 42, 0.28);
+  font-family: 'Outfit', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: 0.76rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--slab-mute);
+  color: var(--gold-deep);
 }
 
 .hero3d__card-chrome--primary {
@@ -139,7 +211,7 @@
 }
 
 .hero3d__card-chrome--primary span:last-child {
-  color: var(--slab-gold);
+  color: var(--gold-deep);
   letter-spacing: 0.04em;
   text-transform: none;
   font-weight: 500;
@@ -147,21 +219,21 @@
 
 .hero3d__benefit {
   margin: 0;
-  font-family: 'Syne', 'Avenir Next', 'Segoe UI', sans-serif;
-  font-size: clamp(1.35rem, 2.6vw, 1.95rem);
-  font-weight: 560;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  font-family: 'Cormorant Garamond', 'Iowan Old Style', Palatino, serif;
+  font-size: clamp(1.4rem, 2.7vw, 2.05rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.18;
   color: var(--slab-ink);
 }
 
 .hero3d__benefit--compact {
   font-size: 0.82rem;
   line-height: 1.35;
-  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family: 'Outfit', 'Avenir Next', 'Segoe UI', sans-serif;
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: rgba(17, 17, 17, 0.72);
+  color: rgba(20, 17, 12, 0.72);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -192,7 +264,7 @@
   width: 1rem;
   height: 1rem;
   margin-top: 0.12rem;
-  border: 1.5px solid rgba(22, 53, 42, 0.55);
+  border: 1.5px solid rgba(168, 132, 42, 0.55);
   border-radius: 0.15rem;
   background: rgba(255, 255, 255, 0.35);
   flex-shrink: 0;
@@ -217,7 +289,7 @@
 }
 
 .hero3d__label {
-  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family: 'Outfit', 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: clamp(0.88rem, 1.35vw, 1.05rem);
   line-height: 1.35;
   color: var(--slab-ink);
@@ -229,7 +301,7 @@
 }
 
 .hero3d__task--done .hero3d__label {
-  color: rgba(22, 53, 42, 0.45);
+  color: rgba(20, 17, 12, 0.42);
   text-decoration: line-through;
   text-decoration-thickness: 1px;
 }
@@ -242,7 +314,7 @@
   .hero3d__rig,
   .hero3d--featuring .hero3d__rig {
     inset: 2% 4% 42% 4%;
-    transform: rotateX(10deg) rotateY(-4deg) scale(0.88);
+    transform: rotateX(10deg) rotateY(-4deg) scale(0.9);
   }
 
   .hero3d__orbit {
@@ -276,7 +348,7 @@
   }
 
   .hero3d__benefit {
-    font-size: clamp(1.15rem, 5vw, 1.45rem);
+    font-size: clamp(1.2rem, 5vw, 1.5rem);
   }
 }
 

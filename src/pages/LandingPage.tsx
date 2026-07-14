@@ -54,9 +54,11 @@ export function LandingPage() {
   const introY = useTransform(smoothProgress, [0, 0.12], [0, reduceMotion ? 0 : -28])
   const hintOpacity = useTransform(smoothProgress, [0, 0.04, 0.1], [1, 1, 0])
   const arrowOpacity = useTransform(smoothProgress, [0, 0.78, 0.9], [1, 0.85, 0])
+  const glowOpacity = useTransform(smoothProgress, [0, 0.12, 0.28], [1, 0.7, 0.25])
 
   return (
     <div className="landing" data-testid="parallax-landing">
+      <div className="landing__grain" aria-hidden="true" />
       <LandingNavbar />
       <div
         className="landing__scroll-track"
@@ -66,6 +68,11 @@ export function LandingPage() {
       >
         <div className="landing__sticky">
           <Hero3D activeCard={activeCard} />
+          <motion.div
+            className="landing__hero-glow"
+            style={{ opacity: glowOpacity }}
+            aria-hidden="true"
+          />
           <div className="landing__hero-veil" />
           <motion.div
             className="landing__scroll-arrow"
