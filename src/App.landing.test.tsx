@@ -15,7 +15,7 @@ describe('Landing routing', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: /a quieter way to move work forward/i,
+        name: /let to-do manage your daily tasks so you don't have to/i,
       }),
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /start your list/i })).toBeInTheDocument()
